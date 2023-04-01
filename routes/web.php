@@ -21,5 +21,6 @@ Route::get('/', function () {
 Route::get('/{slug?}', function ($slug) {
     // dd($slug);
     $page = Page::where('slug', $slug)->first();
+    abort_unless($page, 404);
     return view('page', compact('page'));
-})->where('slug', '.*');
+})->name('pages.show')->where(['slug' => '.*']);

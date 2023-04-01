@@ -16,28 +16,29 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 
 class TemplateResource extends Resource
 {
     use BlockBuilderTrait;
 
     protected static ?string $model = Template::class;
-
+    protected static ?string $navigationGroup = 'Advanced';
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(
-                array_merge(
-                    [
+            ->schema([
+                Grid::make(2)
+                    ->schema(array_merge([
                         TextInput::make('name')
                             ->required()
+                            ->columnSpan(1)
                             ->maxLength(255),
-                    ],
-                    self::getBlockBuilderFields()
-                )
-            );
+                    ], self::getBlockBuilderFields()))
+            ]);
     }
 
     public static function table(Table $table): Table

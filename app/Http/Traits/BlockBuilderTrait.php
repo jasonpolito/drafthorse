@@ -74,9 +74,9 @@ trait BlockBuilderTrait
     {
         return [
             Card::make()
-                ->hidden(fn (Closure $get) => $get('use_template'))
                 ->schema([
                     BlockBuilder::make('blocks')
+                        ->label('Template Blocks')
                         ->columnSpan(2)
                         ->collapsible()
                         ->blocks([
@@ -84,25 +84,25 @@ trait BlockBuilderTrait
                                 ->label('Hero')
                                 ->icon('heroicon-o-pencil-alt')
                                 ->schema([
-                                    Tabs::make('content')
-                                        ->schema([
-                                            Tab::make('Content')
-                                                ->schema([
-                                                    TiptapEditor::make('content')
-                                                        ->label(false)
-                                                        ->profile('simple'),
-                                                ]),
-                                        ])
+                                    TiptapEditor::make('content')
+                                        ->label(false)
+                                        ->profile('simple'),
                                 ]),
                             Block::make('rich-content')
                                 ->label('Text Content')
                                 ->icon('heroicon-o-pencil-alt')
                                 ->schema([
-                                    Tab::make('content')
-                                        ->schema([
-                                            TiptapEditor::make('content')
-                                                ->label(false)
-                                        ]),
+                                    TiptapEditor::make('content')
+                                        ->label(false)
+                                ]),
+                            Block::make('code')
+                                ->label('Raw Code')
+                                ->icon('heroicon-o-pencil-alt')
+                                ->schema([
+                                    CodeField::make('content')
+                                        ->label('Raw Code')
+                                        ->htmlField()
+                                        ->withLineNumbers()
                                 ]),
                         ])
                 ])

@@ -77,39 +77,33 @@ class PageResource extends Resource
                         Tab::make('Details')
                             ->label('SEO & Settings')
                             ->schema([
-                                Tabs::make('details')
+                                Grid::make(2)
                                     ->schema([
-                                        Tab::make("SEO")
-                                            ->schema([
-                                                Grid::make(2)
-                                                    ->schema([
-                                                        TextInput::make('seo.meta_title')
-                                                            ->placeholder('Title Tag')
-                                                            ->reactive()
-                                                            ->afterStateUpdated(function (Closure $set, $state) {
-                                                                $set('seo.og_title', $state);
-                                                            })
-                                                            ->label('Title Tag'),
-                                                        TextInput::make('seo.og_title')
-                                                            ->placeholder('OpenGraph Title')
-                                                            ->label('OpenGraph Title'),
-                                                        Textarea::make('seo.meta_description')
-                                                            ->rows(2)
-                                                            ->maxLength(200)
-                                                            ->placeholder('Meta Description')
-                                                            ->reactive()
-                                                            ->afterStateUpdated(function (Closure $set, $state) {
-                                                                $set('seo.og_description', $state);
-                                                            })
-                                                            ->label('Meta Description'),
-                                                        Textarea::make('seo.og_description')
-                                                            ->rows(2)
-                                                            ->maxLength(200)
-                                                            ->placeholder('OpenGraph Description')
-                                                            ->label('OpenGraph Description'),
-                                                    ]),
-                                            ])
-                                    ])
+                                        TextInput::make('seo.meta_title')
+                                            ->placeholder('Title Tag')
+                                            ->reactive()
+                                            ->afterStateUpdated(function (Closure $set, $state) {
+                                                $set('seo.og_title', $state);
+                                            })
+                                            ->label('Title Tag'),
+                                        TextInput::make('seo.og_title')
+                                            ->placeholder('OpenGraph Title')
+                                            ->label('OpenGraph Title'),
+                                        Textarea::make('seo.meta_description')
+                                            ->rows(2)
+                                            ->maxLength(200)
+                                            ->placeholder('Meta Description')
+                                            ->reactive()
+                                            ->afterStateUpdated(function (Closure $set, $state) {
+                                                $set('seo.og_description', $state);
+                                            })
+                                            ->label('Meta Description'),
+                                        Textarea::make('seo.og_description')
+                                            ->rows(2)
+                                            ->maxLength(200)
+                                            ->placeholder('OpenGraph Description')
+                                            ->label('OpenGraph Description'),
+                                    ]),
                             ]),
                     ]),
             ]);
@@ -125,7 +119,7 @@ class PageResource extends Resource
                     ->label('URL')
                     ->searchable()
                     ->toggleable()
-                    ->url(fn (Page $record): string => route('pages.view', ['slug' => $record->slug])),
+                    ->url(fn (Page $record): string => route('pages.show', ['slug' => $record->slug])),
                 TextColumn::make('taxonomy.name')
                     ->toggleable()
             ])
