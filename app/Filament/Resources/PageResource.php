@@ -42,8 +42,10 @@ class PageResource extends Resource
                         Tab::make('General')
                             ->schema([
                                 Grid::make()
+                                    ->columns(6)
                                     ->schema([
                                         TextInput::make('name')
+                                            ->columnSpan(2)
                                             ->afterStateUpdated(function (Closure $get, Closure $set, ?string $state) {
                                                 if (!$get('is_slug_changed_manually') && filled($state)) {
                                                     $set('slug', Str::slug($state));
@@ -53,6 +55,7 @@ class PageResource extends Resource
                                             ->required()
                                             ->unique(ignorable: fn ($record) => $record),
                                         TextInput::make('slug')
+                                            ->columnSpan(2)
                                             ->afterStateUpdated(function (Closure $set) {
                                                 $set('is_slug_changed_manually', true);
                                             })
@@ -60,10 +63,16 @@ class PageResource extends Resource
                                         Hidden::make('is_slug_changed_manually')
                                             ->default(false)
                                             ->dehydrated(false),
-                                        Select::make('taxonomy')
+                                        Select::make('taxonomy_id')
+                                            ->reactive()
                                             ->required()
-                                            ->relationship('taxonomy', 'name')
-                                    ])
+                                            ->relationship('taxonomy', 'name'),
+                                        Select::make('template_id')
+                                            ->reactive()
+                                            ->required()
+                                            ->relationship('template', 'name')
+                                    ]),
+                                self::getTaxonomyFields()
                             ]),
                         Tab::make('Details')
                             ->label('SEO & Settings')

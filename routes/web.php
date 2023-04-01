@@ -19,6 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/{slug?}', function ($slug) {
+    // dd($slug);
     $page = Page::where('slug', $slug)->first();
     return view('page', compact('page'));
-})->name('pages.view');
+})->where('slug', '.*');

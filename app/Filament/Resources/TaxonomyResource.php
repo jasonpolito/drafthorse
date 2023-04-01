@@ -6,6 +6,7 @@ use App\Filament\Resources\TaxonomyResource\Pages;
 use App\Filament\Resources\TaxonomyResource\RelationManagers;
 use App\Models\Taxonomy;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -30,24 +31,31 @@ class TaxonomyResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->required(),
-                Repeater::make('fields')
+                Grid::make(2)
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Field name')
-                            ->placeholder('Field name')
-                            ->required(),
-                        Select::make('type')
-                            ->label('Field type')
-                            ->required()
-                            ->options([
-                                'Filament\Forms\Components\TextInput' => 'Short Text',
-                                'Filament\Forms\Components\Textarea' => 'Long Text',
-                                'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
-                                'Filament\Forms\Components\Toggle' => 'Checkbox',
-                                'Filament\Forms\Components\Select' => 'Select',
-                                'Filament\Forms\Components\FileUpload' => 'File Upload',
-                                'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+                        TextInput::make('name')->required(),
+                        Repeater::make('fields')
+                            ->columnSpan(2)
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->label('Field name')
+                                            ->placeholder('Field name')
+                                            ->required(),
+                                        Select::make('type')
+                                            ->label('Field type')
+                                            ->required()
+                                            ->options([
+                                                'Filament\Forms\Components\TextInput' => 'Short Text',
+                                                'Filament\Forms\Components\Textarea' => 'Long Text',
+                                                'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+                                                'Filament\Forms\Components\Toggle' => 'Checkbox',
+                                                'Filament\Forms\Components\Select' => 'Select',
+                                                'Filament\Forms\Components\FileUpload' => 'File Upload',
+                                                'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+                                            ])
+                                    ])
                             ])
                     ])
                 //

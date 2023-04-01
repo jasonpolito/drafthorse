@@ -40,4 +40,14 @@ class Page extends Model implements HasMedia
     {
         return $this->belongsTo(Taxonomy::class);
     }
+
+    public function template()
+    {
+        return $this->belongsTo(Template::class);
+    }
+
+    public function getBlocks()
+    {
+        return $this->template->replaceTokens($this);
+    }
 }

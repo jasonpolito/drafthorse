@@ -1,6 +1,6 @@
 @extends('layouts.default')
 @section('content')
-@foreach ((array) $page->getBlocks() as $block)
+@foreach ($page->getBlocks() as $block)
 @php
 $component = 'blocks.' . $block['type'];
 $data = $block['data'];

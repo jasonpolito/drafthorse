@@ -1,11 +1,3 @@
-@php
-$globals = App\Models\Component::global()->get();
-$headers = $globals->filter(function($item) {
-return $item->position == 'header';
-});
-@endphp
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,16 +10,6 @@ return $item->position == 'header';
 </head>
 
 <body>
-    @foreach ($headers as $component)
-    @foreach ($component->blocks as $block)
-    @php
-    $component = 'blocks.' . $block['type'];
-    $data = new \Illuminate\View\ComponentAttributeBag($block['data']);
-    @endphp
-    <x-dynamic-component :component="$component" :attributes="$data" />
-
-    @endforeach
-    @endforeach
     @yield('content')
     <div class="fixed bottom-0 right-0 z-50 p-4"><a
             href="{{ route('filament.resources.pages.edit', ['record' => $page]) }}"

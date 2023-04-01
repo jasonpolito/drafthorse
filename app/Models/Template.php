@@ -6,22 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Template extends Model implements HasMedia
+class Template extends Model
 {
-    use HasFactory, SoftDeletes, InteractsWithMedia;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'title',
-        'fields',
-        'blocks',
-    ];
+    protected $guarded = ['id'];
 
     protected $casts = [
         'blocks' => 'array',
-        'fields' => 'array',
     ];
 
     public const FIELD_TYPES = [
@@ -37,13 +30,6 @@ class Template extends Model implements HasMedia
         'color' => [
             'Filament\Forms\Components\ColorPicker'
         ],
-        // 'Filament\Forms\Components\TextInput' => 'Short Text',
-        // 'Filament\Forms\Components\Textarea' => 'Long Text',
-        // 'Filament\Forms\Components\Select' => 'Select',
-        // 'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
-        // 'Filament\Forms\Components\Toggle' => 'Checkbox',
-        // 'Filament\Forms\Components\FileUpload' => 'File Upload',
-        // 'Filament\Forms\Components\ColorPicker' => 'Color Picker',
     ];
 
     public function getFieldOptions($type = false): array
@@ -67,9 +53,9 @@ class Template extends Model implements HasMedia
     public function replaceTokens(Page $page): array
     {
         $jsonString = json_encode($this->blocks);
-        foreach ($this->fields as $field) {
+        foreach ($page->taxonomy->fields as $field) {
             $token = Str::snake($field['name']);
-            $content = $page['template_data'][$token] ?? false;
+            $content = $page->data[$token] ?? false;
             $replace = addcslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br/>', $content), '"');
             if ($content) {
                 $jsonString = Str::replace("{{ $token }}", $replace, $jsonString);
