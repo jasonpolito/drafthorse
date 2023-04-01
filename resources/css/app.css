@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    position: relative;
+}
+
+.prose .btn {
+    @apply inline-block px-5 py-3 my-6 text-white no-underline transition bg-blue-500 rounded shadow;
+}
+.prose .btn:last-child {
+    @apply mb-0;
+}
+
+.prose .checked-list li::marker {
+    content: "✓";
+}
+
+.prose p {
+    min-height: 1px;
+}
+
+.prose .btn:hover {
+    @apply text-white shadow-lg;
+}
+
+@media screen(md) {
+.prose .btn {
+    @apply py-4 my-6 px-7;
+}
+}
+
+.prose .responsive {
+    @apply my-8 overflow-hidden rounded;
+}
+
+.prose .responsive:first-child {
+    @apply mt-0;
+}
+
+.prose .responsive:last-child {
+    @apply mb-0;
+}
+
+.prose > ul li > *:not(:where([class~="not-prose"] *)) {
+    margin: 0;
+}

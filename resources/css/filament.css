@@ -1,0 +1,5 @@
+@import '../../vendor/filament/filament/resources/css/app.css';
+
+.filament-footer {
+    display: none;
+}
