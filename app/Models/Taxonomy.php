@@ -13,6 +13,7 @@ class Taxonomy extends Model
 
     protected $fillable = [
         'name',
+        'icon',
         'fields',
     ];
 

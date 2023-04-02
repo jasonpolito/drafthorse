@@ -21,8 +21,10 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('main_image')->nullable();
             $table->json('seo')->nullable();
+            $table->json('data')->nullable();
             $table->unsignedInteger('parent_id')->nullable();
             $table->foreignIdFor(Taxonomy::class)->nullable();
+            $table->foreignIdFor(Template::class)->nullable();
         });
     }
 

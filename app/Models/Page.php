@@ -18,6 +18,7 @@ class Page extends Model implements HasMedia
         'slug',
         'seo',
         'taxonomy_id',
+        'parent_id',
         'data',
     ];
 
@@ -46,8 +47,31 @@ class Page extends Model implements HasMedia
         return $this->belongsTo(Template::class);
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(Page::class);
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Page::class);
+    }
+
     public function getBlocks()
     {
-        return $this->template->replaceTokens($this);
+        if ($this->template()->exists()) {
+            return $this->template->replaceTokens($this);
+        } else {
+            return [];
+        }
+    }
+
+    public function getSlug()
+    {
+        if ($this->parent()->exists()) {
+            return $this->parent->getSlug() . '/' . $this->slug;
+        } else {
+            return $this->slug;
+        }
     }
 }

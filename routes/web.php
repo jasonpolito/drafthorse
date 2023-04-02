@@ -20,7 +20,12 @@ Route::get('/', function () {
 
 Route::get('/{slug?}', function ($slug) {
     // dd($slug);
-    $page = Page::where('slug', $slug)->first();
-    abort_unless($page, 404);
-    return view('page', compact('page'));
+    $parts = explode('/', $slug);
+    $last = $parts[count($parts) - 1];
+    $page = Page::where('slug', $last)->first();
+    if ($page->getSlug() == $slug) {
+        return view('page', compact('page'));
+    } else {
+        abort(404);
+    }
 })->name('pages.show')->where(['slug' => '.*']);

@@ -5,8 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TemplateResource\Pages;
 use App\Filament\Resources\TemplateResource\RelationManagers;
 use App\Http\Traits\BlockBuilderTrait;
+use App\Models\Page;
 use App\Models\Template;
 use Filament\Forms;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\View;
 
 class TemplateResource extends Resource
 {
@@ -25,19 +28,31 @@ class TemplateResource extends Resource
 
     protected static ?string $model = Template::class;
     protected static ?string $navigationGroup = 'Advanced';
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-template';
 
     public static function form(Form $form): Form
     {
+        // dd(get_class_methods($form));
         return $form
             ->schema([
                 Grid::make(2)
-                    ->schema(array_merge([
+                    ->schema([
                         TextInput::make('name')
                             ->required()
                             ->columnSpan(1)
                             ->maxLength(255),
-                    ], self::getBlockBuilderFields()))
+                        Tabs::make('tabs')
+                            ->columnSpanFull()
+                            ->tabs([
+                                Tab::make('Blocks')
+                                    ->schema(self::getBlockBuilderFields()),
+                                // Tab::make('Preview')
+                                //     ->schema([
+                                //         View::make('admin.preview')
+                                //             ->viewData(['form' => 'sfdsdsdfs'])
+                                //     ])
+                            ])
+                    ])
             ]);
     }
 

@@ -56,7 +56,11 @@ class Template extends Model
         foreach ($page->taxonomy->fields as $field) {
             $token = Str::snake($field['name']);
             $content = $page->data[$token] ?? false;
-            $replace = addcslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br/>', $content), '"');
+            if (Str::contains('<script', $content)) {
+                $replace = addcslashes($content, '"');
+            } else {
+                $replace = addcslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br/>', $content), '"');
+            }
             if ($content) {
                 $jsonString = Str::replace("{{ $token }}", $replace, $jsonString);
             }

@@ -17,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Guava\FilamentIconPicker\Forms\IconPicker;
 
 class TaxonomyResource extends Resource
 {
@@ -34,6 +35,8 @@ class TaxonomyResource extends Resource
                 Grid::make(2)
                     ->schema([
                         TextInput::make('name')->required(),
+                        IconPicker::make('icon')
+                            ->columns(5),
                         Repeater::make('fields')
                             ->columnSpan(2)
                             ->schema([
@@ -46,14 +49,18 @@ class TaxonomyResource extends Resource
                                         Select::make('type')
                                             ->label('Field type')
                                             ->required()
+                                            ->searchable()
+                                            ->preload()
                                             ->options([
                                                 'Filament\Forms\Components\TextInput' => 'Short Text',
                                                 'Filament\Forms\Components\Textarea' => 'Long Text',
                                                 'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+                                                'Filament\Forms\Components\Builder' => 'Block Editor',
                                                 'Filament\Forms\Components\Toggle' => 'Checkbox',
                                                 'Filament\Forms\Components\Select' => 'Select',
                                                 'Filament\Forms\Components\FileUpload' => 'File Upload',
                                                 'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+                                                'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
                                             ])
                                     ])
                             ])

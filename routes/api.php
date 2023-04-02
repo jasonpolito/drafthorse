@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Route::prefix('/api')->group(function () {
-Route::get('/pages', function () {
+Route::get('/records', function () {
     return new PagesCollection(Page::all());
 });
 Route::get('/pages/{id}', function ($id) {

@@ -46,3 +46,15 @@
 .prose > ul li > *:not(:where([class~="not-prose"] *)) {
     margin: 0;
 }
+
+.prose [cols="3"] {
+    @apply grid grid-cols-3 gap-8;
+}
+
+.prose table *:last-child {
+    @apply mb-0;
+}
+
+.prose table *:first-child {
+    @apply mt-0;
+}

@@ -43,6 +43,14 @@ trait BlockBuilderTrait
             ->schema(fn (Closure $get) => self::getTaxonomyFieldsByType($get('taxonomy_id')));
     }
 
+    public static function isFullWidth($type)
+    {
+        return in_array($type, [
+            'FilamentTiptapEditor\TiptapEditor',
+            'Creagia\FilamentCodeField\CodeField'
+        ]);
+    }
+
     public static function getTaxonomyFieldsByType($taxonomy_id)
     {
         $taxonomy = Taxonomy::find($taxonomy_id);
@@ -51,20 +59,32 @@ trait BlockBuilderTrait
             foreach ($taxonomy->fields as $field) {
                 $type = $field['type'];
                 $snaked = Str::snake($field['name']);
-                $component = $type::make('data.' . $snaked);
-                if (method_exists($type, 'placeholder')) {
-                    $component->placeholder($field['name']);
+                if (Str::contains($type, 'Builder')) {
+                    array_merge(
+                        $fields,
+                        self::getBlockBuilderFields()
+                    );
+                } else {
+                    $component = $type::make('data.' . $snaked);
+                    if (method_exists($type, 'placeholder')) {
+                        $component->placeholder($field['name']);
+                    }
+                    if (Str::contains($type, 'ColorPicker')) {
+                        $component->rgba();
+                    }
+                    if (Str::contains($type, 'CodeField')) {
+                        $component
+                            ->htmlField()
+                            ->withLineNumbers();
+                    }
+                    if (self::isFullWidth($type)) {
+                        $component->columnSpan(2);
+                    }
+                    array_push(
+                        $fields,
+                        $component
+                    );
                 }
-                if (Str::contains($type, 'ColorPicker')) {
-                    $component->rgba();
-                }
-                if (Str::contains($type, 'TiptapEditor')) {
-                    $component->columnSpan(2);
-                }
-                array_push(
-                    $fields,
-                    $component
-                );
             }
         }
         return $fields;
@@ -73,10 +93,12 @@ trait BlockBuilderTrait
     public static function getBlockBuilderFields()
     {
         return [
-            Card::make()
+            Grid::make(1)
                 ->schema([
                     BlockBuilder::make('blocks')
-                        ->label('Template Blocks')
+                        ->createItemButtonLabel('Add Block')
+                        ->name("sdffsdsd")
+                        ->label(false)
                         ->columnSpan(2)
                         ->collapsible()
                         ->blocks([
@@ -95,9 +117,16 @@ trait BlockBuilderTrait
                                     TiptapEditor::make('content')
                                         ->label(false)
                                 ]),
+                            Block::make('big-image')
+                                ->label('Big Image')
+                                ->icon('heroicon-o-pencil-alt')
+                                ->schema([
+                                    FileUpload::make('content')
+                                    // ->label('false')
+                                ]),
                             Block::make('code')
                                 ->label('Raw Code')
-                                ->icon('heroicon-o-pencil-alt')
+                                ->icon('heroicon-o-code')
                                 ->schema([
                                     CodeField::make('content')
                                         ->label('Raw Code')
