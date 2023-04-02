@@ -12,3 +12,9 @@ $img = Storage::url($data['bg_image'] ?? '');
 </x-section>
 
 {!! Str::replace('selector', '#afasd', $data['custom_code'] ?? '') !!}
+
+<table>
+    <tbody>
+        <th></th>
+    </tbody>
+</table>
