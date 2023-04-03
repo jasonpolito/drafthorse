@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Page;
+use App\Models\Record;
 use App\Models\Taxonomy;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -31,19 +32,19 @@ class AppServiceProvider extends ServiceProvider
         $ts = Schema::hasTable('taxonomies') ? Taxonomy::all() : [];
         $menu = [];
         $link = NavigationItem::make('All')
-            ->url("/admin/pages")
-            ->isActiveWhen(fn (): bool => URL::full() == env('APP_URL') . '/admin/pages')
+            ->url("/admin/records")
+            ->isActiveWhen(fn (): bool => URL::full() == env('APP_URL') . '/admin/records')
             ->icon('heroicon-o-collection')
             ->activeIcon('heroicon-s-collection')
             ->group('Records');
         array_push($menu, $link);
         foreach ($ts as $item) {
-            $url = "/admin/pages?tableFilters[taxonomy][values][0]=$item->id";
+            $url = "/admin/records?tableFilters[taxonomy][values][0]=$item->id";
             $link = NavigationItem::make(Str::plural($item->name))
                 ->url($url)
                 ->isActiveWhen(function () use ($url, $item) {
-                    $record = Page::find(Request::route()->parameter('record'));
-                    if ($record) {
+                    $record = Record::find(Request::route()->parameter('record'));
+                    if ($record && Str::contains(URL::full(), 'records')) {
                         return $record->taxonomy->id == $item->id;
                     } else {
                         return Str::contains(urldecode(URL::full()), $url);

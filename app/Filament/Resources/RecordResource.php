@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Resources\RecordResource\Pages;
 use App\Http\Traits\BlockBuilderTrait;
-use App\Models\Page;
+use App\Models\Record;
 use Closure;
 use Filament\Forms\Components\Card;
 use Illuminate\Support\Str;
@@ -25,12 +25,12 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput\Mask;
 use Filament\Tables\Filters\SelectFilter;
 
-class PageResource extends Resource
+class RecordResource extends Resource
 {
     use BlockBuilderTrait;
 
     protected static ?string $label = 'record';
-    protected static ?string $model = Page::class;
+    protected static ?string $model = Record::class;
     protected static ?string $navigationGroup = 'Content';
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $recordTitleAttribute = 'name';
@@ -41,14 +41,14 @@ class PageResource extends Resource
         return $form
             ->columns(3)
             ->schema([
-                Tabs::make('page')
+                Tabs::make('record')
                     ->columnSpan(2)
                     ->tabs([
                         Tab::make('Content')
                             ->schema(
                                 array_merge([
                                     TextInput::make('name')
-                                        ->columnSpan(2)
+                                        ->columnSpanFull()
                                         ->label('Record Title')
                                         ->placeholder('Record Title')
                                         ->afterStateUpdated(function (Closure $get, Closure $set, ?string $state) {
@@ -108,8 +108,8 @@ class PageResource extends Resource
                                             $domain = env('APP_URL');
                                             $parent = $record->parent()->exists() ? $record->parent->getSlug() : null;
                                             $slug = $get('slug');
-                                            $fullUrl = implode('/', [$domain, $parent, $slug]);
-                                            $displayUrl = implode('/', [$parent, $slug]);
+                                            $fullUrl = implode('/', array_filter([$domain, $parent, $slug]));
+                                            $displayUrl = implode('/', array_filter([$parent, $slug]));
                                             return "<a href='$fullUrl'>$displayUrl</a>";
                                         } else {
                                             return $get('slug');
@@ -139,11 +139,11 @@ class PageResource extends Resource
                                     ->reactive()
                                     ->searchable()
                                     ->preload()
-                                    ->options(function (?Page $record) {
+                                    ->options(function (?Record $record) {
                                         if ($record) {
-                                            return Page::whereNotIn('id', [$record->id])->get()->pluck('name', 'id');
+                                            return Record::whereNotIn('id', [$record->id])->get()->pluck('name', 'id');
                                         } else {
-                                            return Page::all()->pluck('name', 'id');
+                                            return Record::all()->pluck('name', 'id');
                                         }
                                     }),
                             ])
@@ -157,34 +157,27 @@ class PageResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    // ->description(fn (Page $record): string => $record->taxonomy->name)
                     ->description(function ($record) {
                         return !request()->input('tableFilters') ? $record->taxonomy->name : false;
                     })
                     ->limit(50)
                     ->sortable()
-                    // ->icon(fn (Page $record): string => $record->taxonomy->icon)
-                    // ->icon(function ($record) {
-                    //     return !request()->input('tableFilters') ? $record->taxonomy->icon : false;
-                    // })
                     ->searchable(),
                 TextColumn::make('slug')
                     ->label('URL')
                     ->sortable()
                     ->searchable()
-                    ->getStateUsing(function (Page $record) {
+                    ->getStateUsing(function (Record $record) {
                         return $record->getSlug();
                     })
                     ->limit(50)
                     ->toggleable()
-                    ->url(fn (Page $record): string => route('pages.show', ['slug' => $record->getSlug()])),
+                    ->url(fn (Record $record): string => route('pages.show', ['slug' => $record->getSlug()])),
 
                 TextColumn::make('updated_at')
                     ->label('Updated')
                     ->sortable()
                     ->since(),
-                // TextColumn::make('taxonomy.name')
-                //     ->toggleable()
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -212,9 +205,9 @@ class PageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPages::route('/'),
-            'create' => Pages\CreatePage::route('/create'),
-            'edit' => Pages\EditPage::route('/{record}/edit'),
+            'index' => Pages\ListRecords::route('/'),
+            'create' => Pages\CreateRecord::route('/create'),
+            'edit' => Pages\EditRecord::route('/{record}/edit'),
         ];
     }
 

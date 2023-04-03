@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Page;
+use App\Models\Record;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,10 +20,11 @@ Route::get('/', function () {
 });
 
 Route::get('/{slug?}', function ($slug) {
-    // dd($slug);
     $parts = explode('/', $slug);
     $last = $parts[count($parts) - 1];
-    $page = Page::where('slug', $last)->first();
+    $page = Record::where('slug', $last)->with(['children', 'parent'])->first();
+    $page->getRelationships();
+    return collect($page);
     if ($page->getSlug() == $slug) {
         return view('page', compact('page'));
     } else {

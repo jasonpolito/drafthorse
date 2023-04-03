@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pages', function (Blueprint $table) {
+        Schema::create('records', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pages');
+        Schema::dropIfExists('records');
     }
 };

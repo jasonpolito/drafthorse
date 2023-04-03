@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\PageResource\Pages;
+namespace App\Filament\Resources\RecordResource\Pages;
 
-use App\Filament\Resources\PageResource;
+use App\Filament\Resources\RecordResource;
 use App\Models\Page;
 use Closure;
 use Filament\Pages\Actions\Action;
 use Filament\Pages\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\EditRecord as EditRecordClass;
 
-class EditPage extends EditRecord
+class EditRecord extends EditRecordClass
 {
-    protected static string $resource = PageResource::class;
+    protected static string $resource = RecordResource::class;
 
     protected function getActions(): array
     {

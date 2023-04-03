@@ -5,7 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TaxonomyResource\Pages;
 use App\Filament\Resources\TaxonomyResource\RelationManagers;
 use App\Models\Taxonomy;
+use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -32,35 +35,58 @@ class TaxonomyResource extends Resource
     {
         return $form
             ->schema([
-                Grid::make(2)
+                Grid::make(3)
                     ->schema([
-                        TextInput::make('name')->required(),
-                        IconPicker::make('icon')
-                            ->columns(5),
-                        Repeater::make('fields')
+                        Card::make()
+                            ->columnSpan(1)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->unique(ignorable: fn ($record) => $record)
+                                    ->required(),
+                                IconPicker::make('icon')
+                                    ->required()
+                                    ->columns(5),
+                            ]),
+                        Card::make()
                             ->columnSpan(2)
                             ->schema([
-                                Grid::make(2)
+                                Repeater::make('fields')
+                                    ->columnSpan(2)
                                     ->schema([
-                                        TextInput::make('name')
-                                            ->label('Field name')
-                                            ->placeholder('Field name')
-                                            ->required(),
-                                        Select::make('type')
-                                            ->label('Field type')
-                                            ->required()
-                                            ->searchable()
-                                            ->preload()
-                                            ->options([
-                                                'Filament\Forms\Components\TextInput' => 'Short Text',
-                                                'Filament\Forms\Components\Textarea' => 'Long Text',
-                                                'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
-                                                'Filament\Forms\Components\Builder' => 'Block Editor',
-                                                'Filament\Forms\Components\Toggle' => 'Checkbox',
-                                                'Filament\Forms\Components\Select' => 'Select',
-                                                'Filament\Forms\Components\FileUpload' => 'File Upload',
-                                                'Filament\Forms\Components\ColorPicker' => 'Color Picker',
-                                                'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextInput::make('name')
+                                                    ->label('Field name')
+                                                    ->placeholder('Field name')
+                                                    ->required(),
+                                                Select::make('type')
+                                                    ->label('Field type')
+                                                    ->required()
+                                                    ->reactive()
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->options([
+                                                        'Filament\Forms\Components\TextInput' => 'Short Text',
+                                                        'Filament\Forms\Components\Textarea' => 'Long Text',
+                                                        'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+                                                        'Filament\Forms\Components\Builder' => 'Block Editor',
+                                                        'Filament\Forms\Components\Toggle' => 'Checkbox',
+                                                        'Filament\Forms\Components\Select' => 'Select',
+                                                        'Filament\Forms\Components\FileUpload' => 'File Upload',
+                                                        'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+                                                        'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
+                                                    ]),
+                                                Checkbox::make('multiple'),
+                                                Select::make('relation')
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->options(function (?Taxonomy $record) {
+                                                        if ($record) {
+                                                            return Taxonomy::whereNotIn('id', [$record->id])->pluck('name', 'id');
+                                                        } else {
+                                                            return Taxonomy::all()->pluck('name', 'id');
+                                                        }
+                                                    })
                                             ])
                                     ])
                             ])

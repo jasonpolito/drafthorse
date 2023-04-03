@@ -2,44 +2,23 @@
 
 namespace App\Http\Traits;
 
-use App\Models\Component;
-use App\Models\Page;
+use App\Models\Record;
 use App\Models\Taxonomy;
-use App\Models\Template;
-use App\View\Components\Blocks\Tempalte;
 use Closure;
-use Filament\Forms;
 use Filament\Forms\Components\Builder as BlockBuilder;
 use Filament\Forms\Components\Builder\Block;
-use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use FilamentTiptapEditor\TiptapEditor;
 use Creagia\FilamentCodeField\CodeField;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\ViewField;
-use Filament\Pages\Actions\Action;
 
 trait BlockBuilderTrait
 {
     public static function getTaxonomyFields()
     {
-        return Grid::make(2)
+        return Grid::make()
             ->schema(fn (Closure $get) => self::getTaxonomyFieldsByType($get('taxonomy_id')));
     }
 
@@ -47,6 +26,7 @@ trait BlockBuilderTrait
     {
         return in_array($type, [
             'FilamentTiptapEditor\TiptapEditor',
+            'Filament\Forms\Components\Builder',
             'Creagia\FilamentCodeField\CodeField'
         ]);
     }
@@ -60,17 +40,30 @@ trait BlockBuilderTrait
                 $type = $field['type'];
                 $snaked = Str::snake($field['name']);
                 if (Str::contains($type, 'Builder')) {
-                    array_merge(
+                    $fields = array_merge(
                         $fields,
-                        self::getBlockBuilderFields()
+
+                        // TextInput::make('tst')
+                        self::getBlockBuilderFields("data.$snaked")
                     );
+                    // dd(self::getBlockBuilderFields("data.$snaked"));
                 } else {
-                    $component = $type::make('data.' . $snaked);
+                    $component = $type::make("data.$snaked");
                     if (method_exists($type, 'placeholder')) {
                         $component->placeholder($field['name']);
                     }
                     if (Str::contains($type, 'ColorPicker')) {
                         $component->rgba();
+                    }
+                    if (Str::contains($type, 'Select')) {
+                        $component
+                            ->columnSpanFull()
+                            ->searchable()
+                            ->preload()
+                            ->multiple();
+                        $component->options(function () use ($field) {
+                            return Record::where('taxonomy_id', $field['relation'])->get()->pluck('name', 'id');
+                        });
                     }
                     if (Str::contains($type, 'CodeField')) {
                         $component
@@ -78,7 +71,7 @@ trait BlockBuilderTrait
                             ->withLineNumbers();
                     }
                     if (self::isFullWidth($type)) {
-                        $component->columnSpan(2);
+                        $component->columnSpanFull();
                     }
                     array_push(
                         $fields,
@@ -90,14 +83,14 @@ trait BlockBuilderTrait
         return $fields;
     }
 
-    public static function getBlockBuilderFields()
+    public static function getBlockBuilderFields($name = null)
     {
+        $name = $name ?? 'blocks';
         return [
             Grid::make(1)
                 ->schema([
-                    BlockBuilder::make('blocks')
+                    BlockBuilder::make($name)
                         ->createItemButtonLabel('Add Block')
-                        ->name("sdffsdsd")
                         ->label(false)
                         ->columnSpan(2)
                         ->collapsible()
@@ -110,19 +103,26 @@ trait BlockBuilderTrait
                                         ->label(false)
                                         ->profile('simple'),
                                 ]),
-                            Block::make('rich-content')
+                            Block::make('rich_content')
                                 ->label('Text Content')
                                 ->icon('heroicon-o-pencil-alt')
                                 ->schema([
                                     TiptapEditor::make('content')
                                         ->label(false)
                                 ]),
-                            Block::make('big-image')
+                            Block::make('big_image')
                                 ->label('Big Image')
                                 ->icon('heroicon-o-pencil-alt')
                                 ->schema([
                                     FileUpload::make('content')
                                     // ->label('false')
+                                ]),
+                            Block::make('blocks')
+                                ->label('Render Blocks')
+                                ->icon('heroicon-o-code')
+                                ->schema([
+                                    TextInput::make('content')
+                                        ->label('Render Blocks')
                                 ]),
                             Block::make('code')
                                 ->label('Raw Code')

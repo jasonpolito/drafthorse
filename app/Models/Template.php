@@ -50,18 +50,19 @@ class Template extends Model
         return $options;
     }
 
-    public function replaceTokens(Page $page): array
+    public function replaceTokens(Record $record, $blocks = null): array
     {
-        $jsonString = json_encode($this->blocks);
+        $jsonString = json_encode($blocks);
         foreach ($page->taxonomy->fields as $field) {
             $token = Str::snake($field['name']);
             $content = $page->data[$token] ?? false;
-            if (Str::contains('<script', $content)) {
-                $replace = addcslashes($content, '"');
-            } else {
-                $replace = addcslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br/>', $content), '"');
-            }
-            if ($content) {
+            // dd($content);
+            if ($content && !is_array($content)) {
+                if (Str::contains('<script', $content)) {
+                    $replace = addcslashes($content, '"');
+                } else {
+                    $replace = addcslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br/>', $content), '"');
+                }
                 $jsonString = Str::replace("{{ $token }}", $replace, $jsonString);
             }
         }
