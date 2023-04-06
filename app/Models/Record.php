@@ -23,6 +23,12 @@ class Record extends Model implements HasMedia
         'data',
     ];
 
+    protected $hidden = [
+        'updated_at',
+        'created_at',
+        'deleted_at',
+    ];
+
     protected $casts = [
         'data' => 'array',
         'seo' => 'array',
@@ -53,14 +59,14 @@ class Record extends Model implements HasMedia
         return $this->hasMany(Record::class, 'parent_id');
     }
 
-    public function getRelationships()
+    public function buildTaxonomy()
     {
         foreach ($this->taxonomy->fields as $field) {
-            if ($field['relation']) {
-                $name = Str::snake($field['name']);
-                $ids = $this->data[$name];
-                $records = Record::whereIn('id', $ids)->get();
+            if (!empty($field['relations'])) {
                 $data = $this->data;
+                $name = Str::snake($field['name']);
+                $ids = isset($data[$name]) ? $data[$name] : [];
+                $records = Record::whereIn('id', $ids)->get();
                 $data[$name] = $records->toArray();
                 $this->data = $data;
             }

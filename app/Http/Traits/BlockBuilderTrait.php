@@ -13,10 +13,11 @@ use FilamentTiptapEditor\TiptapEditor;
 use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Illuminate\Support\Facades\Request;
 
 trait BlockBuilderTrait
 {
-    public static function getTaxonomyFields()
+    public static function getTaxonomyFields($page = null)
     {
         return Grid::make()
             ->schema(fn (Closure $get) => self::getTaxonomyFieldsByType($get('taxonomy_id')));
@@ -42,11 +43,8 @@ trait BlockBuilderTrait
                 if (Str::contains($type, 'Builder')) {
                     $fields = array_merge(
                         $fields,
-
-                        // TextInput::make('tst')
                         self::getBlockBuilderFields("data.$snaked")
                     );
-                    // dd(self::getBlockBuilderFields("data.$snaked"));
                 } else {
                     $component = $type::make("data.$snaked");
                     if (method_exists($type, 'placeholder')) {
@@ -59,10 +57,10 @@ trait BlockBuilderTrait
                         $component
                             ->columnSpanFull()
                             ->searchable()
-                            ->preload()
                             ->multiple();
                         $component->options(function () use ($field) {
-                            return Record::where('taxonomy_id', $field['relation'])->get()->pluck('name', 'id');
+                            $ids = $field['relations'];
+                            return Record::whereIn('taxonomy_id', $ids)->get()->pluck('name', 'id');
                         });
                     }
                     if (Str::contains($type, 'CodeField')) {

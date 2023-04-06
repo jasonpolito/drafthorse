@@ -10,7 +10,9 @@ use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -37,16 +39,6 @@ class TaxonomyResource extends Resource
             ->schema([
                 Grid::make(3)
                     ->schema([
-                        Card::make()
-                            ->columnSpan(1)
-                            ->schema([
-                                TextInput::make('name')
-                                    ->unique(ignorable: fn ($record) => $record)
-                                    ->required(),
-                                IconPicker::make('icon')
-                                    ->required()
-                                    ->columns(5),
-                            ]),
                         Card::make()
                             ->columnSpan(2)
                             ->schema([
@@ -77,19 +69,31 @@ class TaxonomyResource extends Resource
                                                         'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
                                                     ]),
                                                 Checkbox::make('multiple'),
-                                                Select::make('relation')
+                                                Select::make('relations')
+                                                    ->label('Relation(s)')
                                                     ->searchable()
                                                     ->preload()
-                                                    ->options(function (?Taxonomy $record) {
-                                                        if ($record) {
-                                                            return Taxonomy::whereNotIn('id', [$record->id])->pluck('name', 'id');
-                                                        } else {
-                                                            return Taxonomy::all()->pluck('name', 'id');
-                                                        }
+                                                    ->multiple()
+                                                    ->options(function () {
+                                                        return Taxonomy::all()->pluck('name', 'id');
+                                                        // if ($record) {
+                                                        //     return Taxonomy::whereNotIn('id', [$record->id])->pluck('name', 'id');
+                                                        // } else {
+                                                        // }
                                                     })
                                             ])
                                     ])
-                            ])
+                            ]),
+                        Card::make()
+                            ->columnSpan(1)
+                            ->schema([
+                                TextInput::make('name')
+                                    ->unique(ignorable: fn ($record) => $record)
+                                    ->required(),
+                                IconPicker::make('icon')
+                                    ->required()
+                                    ->columns(5),
+                            ]),
                     ])
                 //
             ]);

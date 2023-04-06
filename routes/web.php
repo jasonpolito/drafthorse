@@ -23,7 +23,7 @@ Route::get('/{slug?}', function ($slug) {
     $parts = explode('/', $slug);
     $last = $parts[count($parts) - 1];
     $page = Record::where('slug', $last)->with(['children', 'parent'])->first();
-    $page->getRelationships();
+    $page->buildTaxonomy();
     return collect($page);
     if ($page->getSlug() == $slug) {
         return view('page', compact('page'));

@@ -141,7 +141,8 @@ class RecordResource extends Resource
                                     ->preload()
                                     ->options(function (?Record $record) {
                                         if ($record) {
-                                            return Record::whereNotIn('id', [$record->id])->get()->pluck('name', 'id');
+                                            $exclude = array_merge($record->children->pluck('id')->toArray(), [$record->id]);
+                                            return Record::whereNotIn('id', $exclude)->get()->pluck('name', 'id');
                                         } else {
                                             return Record::all()->pluck('name', 'id');
                                         }
@@ -164,7 +165,7 @@ class RecordResource extends Resource
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('slug')
-                    ->label('URL')
+                    ->label('Permalink')
                     ->sortable()
                     ->searchable()
                     ->getStateUsing(function (Record $record) {
