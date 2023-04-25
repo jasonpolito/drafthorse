@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -151,6 +152,29 @@ class Record extends Model implements HasMedia
     //     return (object) $data;
     // }
 
+    public static function makeVariablesOptional($str)
+    {
+        $res = Str::replace('}}', " ?? '' }}", $str);
+        $res = Str::replace('!!}', " ?? '' !!}", $res);
+        return $res;
+    }
+
+    public static function passDataToTemplate($str)
+    {
+        return Str::replace('<x-template', '<x-template :$data ', $str);
+    }
+
+    public static function parseContent($str)
+    {
+        return self::makeVariablesOptional(self::passDataToTemplate($str));
+    }
+
+    public function renderTemplate()
+    {
+        $markup = self::makeVariablesOptional(self::passDataToTemplate($this->data['template']));
+        return Blade::render($markup, ['data' => $this->getData()]);
+    }
+
     public function getData()
     {
         $res = [];
@@ -160,6 +184,6 @@ class Record extends Model implements HasMedia
                 $res[$name] = $info['value'];
             }
         }
-        return $res;
+        return json_decode(json_encode($res));
     }
 }

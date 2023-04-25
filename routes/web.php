@@ -22,6 +22,7 @@ Route::get('/', function () {
 Route::get('/{slug?}', function ($slug) {
     $record = Record::findBySlug($slug);
     $record->withRelations();
-    // return $record->getData();
-    return view('page', ['page' => $record]);
+    $data = $record->getData();
+    // return $record;
+    return view('page', ['page' => $record, 'data' => $data]);
 })->name('pages.show')->where(['slug' => '.*']);
