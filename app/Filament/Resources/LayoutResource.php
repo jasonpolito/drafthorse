@@ -2,34 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TemplateResource\Pages;
-use App\Filament\Resources\TemplateResource\RelationManagers;
-use App\Http\Traits\BlockBuilderTrait;
-use App\Models\Page;
-use App\Models\Template;
+use App\Filament\Resources\LayoutResource\Pages;
+use App\Filament\Resources\LayoutResource\RelationManagers;
+use App\Models\Layout;
 use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\View;
 
-class TemplateResource extends Resource
+class LayoutResource extends Resource
 {
-    use BlockBuilderTrait;
-
-    protected static ?string $model = Template::class;
+    protected static ?string $model = Layout::class;
     protected static ?string $navigationGroup = 'Views';
-    protected static ?string $navigationIcon = 'heroicon-o-cube';
+    protected static ?string $navigationIcon = 'heroicon-o-template';
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
@@ -69,12 +64,7 @@ class TemplateResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
-                // Tables\Columns\TextColumn::make('blocks'),
+                TextColumn::make('name')
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -99,9 +89,9 @@ class TemplateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTemplates::route('/'),
-            'create' => Pages\CreateTemplate::route('/create'),
-            'edit' => Pages\EditTemplate::route('/{record}/edit'),
+            'index' => Pages\ListLayouts::route('/'),
+            'create' => Pages\CreateLayout::route('/create'),
+            'edit' => Pages\EditLayout::route('/{record}/edit'),
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecordResource\Pages;
 use App\Http\Traits\BlockBuilderTrait;
+use App\Models\Layout;
 use App\Models\Record;
 use Closure;
 use Filament\Forms\Components\Card;
@@ -45,26 +46,19 @@ class RecordResource extends Resource
                 Tabs::make('record')
                     ->columnSpan(2)
                     ->tabs([
-                        Tab::make('Content')
+                        Tab::make('Data')
                             ->schema(
-                                array_merge([
-                                    TextInput::make('name')
-                                        ->columnSpanFull()
-                                        ->label('Record Title')
-                                        ->placeholder('Record Title')
-                                        ->afterStateUpdated(function (Closure $get, Closure $set, ?string $state) {
-                                            if (!$get('is_slug_changed_manually') && filled($state)) {
-                                                $set('slug', Str::slug($state));
-                                            }
-                                        })
-                                        ->reactive()
-                                        ->required()
-                                        ->unique(ignorable: fn ($record) => $record),
-                                ], [self::getTaxonomyFields()])
+                                array_merge([], [self::getTaxonomyFields()])
 
                             ),
-                        Tab::make('Template')
+                        Tab::make('View')
                             ->schema([
+                                Select::make('data.layout')
+                                    ->default(1)
+                                    ->required()
+                                    ->options(function (?Record $record) {
+                                        return Layout::all()->pluck('name', 'id');
+                                    }),
                                 CodeField::make('data.template')
                                     ->withLineNumbers()
                                     ->htmlField()
@@ -76,6 +70,26 @@ class RecordResource extends Resource
                     ->schema([
                         Grid::make(1)
                             ->schema([
+                                TextInput::make('name')
+                                    ->columnSpanFull()
+                                    ->placeholder('Record Title')
+                                    ->afterStateUpdated(function (Closure $get, Closure $set, ?string $state) {
+                                        if (!$get('is_slug_changed_manually') && filled($state)) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    })
+                                    // ->helperText(function (Closure $get, $record) {
+                                    //     if ($record) {
+                                    //         $domain = env('APP_URL');
+                                    //         $fullUrl = implode('/', [$domain, 'api', $record->uuid]);
+                                    //         return "<a href='$fullUrl'>$fullUrl</a>";
+                                    //     } else {
+                                    //         return '';
+                                    //     }
+                                    // })
+                                    ->reactive()
+                                    ->required()
+                                    ->unique(ignorable: fn ($record) => $record),
                                 TextInput::make('slug')
                                     ->label('Permalink')
                                     ->placeholder('Permalink')

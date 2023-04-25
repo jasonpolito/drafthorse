@@ -169,10 +169,11 @@ class Record extends Model implements HasMedia
         return self::makeVariablesOptional(self::passDataToTemplate($str));
     }
 
-    public function renderTemplate()
+    public static function renderTemplate($markup, $data)
     {
-        $markup = self::makeVariablesOptional(self::passDataToTemplate($this->data['template']));
-        return Blade::render($markup, ['data' => $this->getData()]);
+        $markup = self::passDataToTemplate(self::makeVariablesOptional($markup));
+        $dataObj = json_decode(json_encode($data['data']));
+        return Blade::render($markup, ['data' => $dataObj]);
     }
 
     public function getData()
@@ -184,6 +185,6 @@ class Record extends Model implements HasMedia
                 $res[$name] = $info['value'];
             }
         }
-        return json_decode(json_encode($res));
+        return $res;
     }
 }

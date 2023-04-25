@@ -29,6 +29,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $link = NavigationItem::make('All')
+            ->url("/admin/records")
+            ->isActiveWhen(fn (): bool => URL::full() == env('APP_URL') . '/admin/records')
+            ->icon('heroicon-o-collection')
+            ->activeIcon('heroicon-s-collection')
+            ->group('Records');
         $ts = Schema::hasTable('taxonomies') ? Taxonomy::all() : [];
         $menu = [];
         $link = NavigationItem::make('All')
@@ -56,11 +62,15 @@ class AppServiceProvider extends ServiceProvider
             array_push($menu, $link);
         }
 
+
         Filament::serving(function () use ($menu) {
             Filament::registerNavigationGroups([
                 NavigationGroup::make()
                     ->label('Records')
                     ->icon('heroicon-o-collection'),
+                NavigationGroup::make()
+                    ->label('Views')
+                    ->icon('heroicon-o-eye'),
                 NavigationGroup::make()
                     ->label('Advanced')
                     ->icon('heroicon-o-beaker'),
