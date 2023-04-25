@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TaxonomyResource\Pages;
 use App\Filament\Resources\TaxonomyResource\RelationManagers;
 use App\Models\Taxonomy;
+use App\Models\User;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
@@ -17,14 +18,22 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Wizard\Step;
+use Filament\Pages\Actions\Modal\Actions\Action as ActionsAction;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Actions\Action;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Guava\FilamentIconPicker\Forms\IconPicker;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class TaxonomyResource extends Resource
 {
@@ -110,8 +119,26 @@ class TaxonomyResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
+                BulkAction::make('export')
+                    ->color('secondary')
+                    ->label(__('Export selected as JSON'))
+                    ->icon('heroicon-s-download')
+                    ->action(function (Collection $records) {
+                        $archive = new \ZipArchive;
+                        $archive->open('file.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+                        foreach ($records as $record) {
+                            $name = Str::slug($record->name, '_') . '.json';
+                            $return = $record->attributesToArray();
+                            $content = json_encode($return, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+                            $archive->addFromString($name, $content);
+                        }
+                        $archive->close();
+                        return response()->download('file.zip');
+                    })
+                    ->deselectRecordsAfterCompletion(),
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),

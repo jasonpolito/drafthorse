@@ -24,4 +24,4 @@ Route::get('/{slug?}', function ($slug) {
     $record->withRelations();
     $data = $record->getData();
     return view('page', ['record' => $record, 'data' => $data]);
-})->name('pages.show')->where(['slug' => '.*']);
+})->name('records.show')->where(['slug' => '.*']);

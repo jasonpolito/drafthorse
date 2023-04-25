@@ -11,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Str;
 use FilamentTiptapEditor\TiptapEditor;
 use Creagia\FilamentCodeField\CodeField;
+use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;

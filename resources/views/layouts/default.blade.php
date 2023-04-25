@@ -114,3 +114,21 @@
 </body>
 
 </html>
+
+
+<x-section>
+    <x-container>
+        <x-prose>
+            <ul>
+                @foreach ($data->children as $child)
+                    <li>
+                        <a href="{{ route('records.show', ['slug' => $child->full_slug]) }}">
+                            <img src="{{ Storage::url($child->data->main_image ?? '') }}" alt="">
+                            {{ $child->name }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </x-prose>
+    </x-container>
+</x-section>

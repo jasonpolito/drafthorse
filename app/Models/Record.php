@@ -180,6 +180,12 @@ class Record extends Model implements HasMedia
     {
         $res = [];
         $res['name'] = $this->name;
+        $res['children'] = $this->children()->get()->map(function ($item) {
+            $data = $item->getData();
+            $item->full_slug = $item->fullSlug();
+            $item->data = $data;
+            return $item;
+        });
         foreach ($this->data as $name => $info) {
             if (is_array($info)) {
                 $res[$name] = $info['value'];

@@ -159,7 +159,7 @@ class RecordResource extends Resource
                     })
                     ->limit(50)
                     ->toggleable()
-                    ->url(fn (Record $record): string => route('pages.show', ['slug' => $record->fullSlug()])),
+                    ->url(fn (Record $record): string => route('records.show', ['slug' => $record->fullSlug()])),
 
                 TextColumn::make('updated_at')
                     ->label('Updated')
