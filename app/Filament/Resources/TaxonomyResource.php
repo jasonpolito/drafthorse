@@ -9,7 +9,9 @@ use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -63,23 +65,21 @@ class TaxonomyResource extends Resource
                                                         'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
                                                         'Filament\Forms\Components\Builder' => 'Block Editor',
                                                         'Filament\Forms\Components\Toggle' => 'Checkbox',
-                                                        'Filament\Forms\Components\Select' => 'Select',
+                                                        'Filament\Forms\Components\Select' => 'Relationship',
                                                         'Filament\Forms\Components\FileUpload' => 'File Upload',
                                                         'Filament\Forms\Components\ColorPicker' => 'Color Picker',
                                                         'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
                                                     ]),
-                                                Checkbox::make('multiple'),
                                                 Select::make('relations')
-                                                    ->label('Relation(s)')
+                                                    ->hidden(fn (Closure $get, $state) => $get('type') !== 'Filament\Forms\Components\Select')
+                                                    ->label('Select Relation(s)')
+                                                    ->placeholder('Select Relation(s)')
+                                                    ->columnSpan(2)
                                                     ->searchable()
                                                     ->preload()
                                                     ->multiple()
                                                     ->options(function () {
                                                         return Taxonomy::all()->pluck('name', 'id');
-                                                        // if ($record) {
-                                                        //     return Taxonomy::whereNotIn('id', [$record->id])->pluck('name', 'id');
-                                                        // } else {
-                                                        // }
                                                     })
                                             ])
                                     ])

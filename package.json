@@ -14,5 +14,8 @@
         "tailwindcss": "^3.2.7",
         "tippy.js": "^6.3.7",
         "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "vanillajs-scrollspy": "^3.0.3"
     }
 }

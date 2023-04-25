@@ -11,6 +11,10 @@ class Template extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'markup',
+    ];
     protected $guarded = ['id'];
 
     protected $casts = [

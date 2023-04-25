@@ -25,11 +25,14 @@ class EditRecord extends EditRecordClass
     }
 
 
-
     protected function getFormActions(): array
     {
         return array_merge(parent::getFormActions(), [
-            Action::make('delete')->action('delete'),
+            // Action::make('delete')->action('delete'),
         ]);
+    }
+
+    protected function afterSave(): void
+    {
     }
 }

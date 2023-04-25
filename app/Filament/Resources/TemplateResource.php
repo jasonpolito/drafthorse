@@ -7,6 +7,7 @@ use App\Filament\Resources\TemplateResource\RelationManagers;
 use App\Http\Traits\BlockBuilderTrait;
 use App\Models\Page;
 use App\Models\Template;
+use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
@@ -27,12 +28,11 @@ class TemplateResource extends Resource
     use BlockBuilderTrait;
 
     protected static ?string $model = Template::class;
-    protected static ?string $navigationGroup = 'Advanced';
+    // protected static ?string $navigationGroup = 'Advanced';
     protected static ?string $navigationIcon = 'heroicon-o-template';
 
     public static function form(Form $form): Form
     {
-        // dd(get_class_methods($form));
         return $form
             ->schema([
                 Grid::make(2)
@@ -44,13 +44,12 @@ class TemplateResource extends Resource
                         Tabs::make('tabs')
                             ->columnSpanFull()
                             ->tabs([
-                                Tab::make('Blocks')
-                                    ->schema(self::getBlockBuilderFields()),
-                                // Tab::make('Preview')
-                                //     ->schema([
-                                //         View::make('admin.preview')
-                                //             ->viewData(['form' => 'sfdsdsdfs'])
-                                //     ])
+                                Tab::make('Markup')
+                                    ->schema([
+                                        CodeField::make('markup')
+                                            ->withLineNumbers()
+                                            ->htmlField()
+                                    ]),
                             ])
                     ])
             ]);

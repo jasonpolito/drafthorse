@@ -1,5 +1,9 @@
 @import '../../vendor/filament/filament/resources/css/app.css';
 
+:root {
+    --sidebar-width: 14rem;
+}
+
 .filament-footer {
     display: none;
 }

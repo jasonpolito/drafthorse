@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('taxonomies', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->softDeletes();
-            $table->string('name');
-            $table->string('icon')->nullable();
-            $table->json('fields')->nullable();
+        Schema::table('templates', function (Blueprint $table) {
+            $table->longText('markup')->nullable();
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('taxonomies');
+        Schema::table('templates', function (Blueprint $table) {
+            $table->dropColumn('markup');
+        });
     }
 };

@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('taxonomies', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->softDeletes();
-            $table->string('name');
-            $table->string('icon')->nullable();
-            $table->json('fields')->nullable();
+        Schema::table('records', function (Blueprint $table) {
+            $table->dropColumn('seo');
+            $table->dropColumn('main_image');
         });
     }
 
@@ -26,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('taxonomies');
+        Schema::table('records', function (Blueprint $table) {
+            $table->json('seo')->nullable();
+            $table->string('main_image')->nullable();
+        });
     }
 };

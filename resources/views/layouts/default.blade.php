@@ -12,8 +12,8 @@
 <body>
     @yield('content')
     <div class="fixed bottom-0 right-0 z-50 p-4"><a
-            href="{{ route('filament.resources.pages.edit', ['record' => $page]) }}"
-            class="block p-3 text-white rounded rounded-full bg-slate-900">
+           href="{{ route('filament.resources.records.edit', ['record' => $page]) }}"
+           class="block p-3 text-white rounded-full bg-slate-900">
             <x-heroicon-o-pencil class="w-5 h-5" />
         </a>
     </div>

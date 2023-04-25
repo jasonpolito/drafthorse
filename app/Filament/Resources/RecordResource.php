@@ -7,6 +7,7 @@ use App\Http\Traits\BlockBuilderTrait;
 use App\Models\Record;
 use Closure;
 use Filament\Forms\Components\Card;
+use Creagia\FilamentCodeField\CodeField;
 use Illuminate\Support\Str;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
@@ -62,37 +63,13 @@ class RecordResource extends Resource
                                 ], [self::getTaxonomyFields()])
 
                             ),
-                        Tab::make('Details')
-                            ->label('SEO & Settings')
+                        Tab::make('Template')
                             ->schema([
-                                Grid::make(2)
-                                    ->schema([
-                                        TextInput::make('seo.meta_title')
-                                            ->placeholder('Title Tag')
-                                            ->reactive()
-                                            ->afterStateUpdated(function (Closure $set, $state) {
-                                                $set('seo.og_title', $state);
-                                            })
-                                            ->label('Title Tag'),
-                                        TextInput::make('seo.og_title')
-                                            ->placeholder('OpenGraph Title')
-                                            ->label('OpenGraph Title'),
-                                        Textarea::make('seo.meta_description')
-                                            ->rows(2)
-                                            ->maxLength(200)
-                                            ->placeholder('Meta Description')
-                                            ->reactive()
-                                            ->afterStateUpdated(function (Closure $set, $state) {
-                                                $set('seo.og_description', $state);
-                                            })
-                                            ->label('Meta Description'),
-                                        Textarea::make('seo.og_description')
-                                            ->rows(2)
-                                            ->maxLength(200)
-                                            ->placeholder('OpenGraph Description')
-                                            ->label('OpenGraph Description'),
-                                    ]),
-                            ]),
+                                CodeField::make('data.template')
+                                    ->withLineNumbers()
+                                    ->htmlField()
+                            ])
+
                     ]),
                 Card::make()
                     ->columnSpan(1)
@@ -106,7 +83,7 @@ class RecordResource extends Resource
                                     ->helperText(function (Closure $get, $record) {
                                         if ($record) {
                                             $domain = env('APP_URL');
-                                            $parent = $record->parent()->exists() ? $record->parent->getSlug() : null;
+                                            $parent = $record->parent()->exists() ? $record->parent->fullSlug() : null;
                                             $slug = $get('slug');
                                             $fullUrl = implode('/', array_filter([$domain, $parent, $slug]));
                                             $displayUrl = implode('/', array_filter([$parent, $slug]));
@@ -115,7 +92,6 @@ class RecordResource extends Resource
                                             return $get('slug');
                                         }
                                     })
-                                    // ->helperText(fn (Closure $get) => env('APP_URL') . '/' . $get('slug'))
                                     ->afterStateUpdated(function (Closure $set) {
                                         $set('is_slug_changed_manually', true);
                                     })
@@ -129,11 +105,6 @@ class RecordResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->relationship('taxonomy', 'name'),
-                                Select::make('template_id')
-                                    ->reactive()
-                                    ->searchable()
-                                    ->preload()
-                                    ->relationship('template', 'name'),
                                 Select::make('parent_id')
                                     ->label('Parent')
                                     ->reactive()
@@ -162,6 +133,7 @@ class RecordResource extends Resource
                         return !request()->input('tableFilters') ? $record->taxonomy->name : false;
                     })
                     ->limit(50)
+                    ->toggleable()
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('slug')
@@ -169,14 +141,15 @@ class RecordResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->getStateUsing(function (Record $record) {
-                        return $record->getSlug();
+                        return $record->fullSlug();
                     })
                     ->limit(50)
                     ->toggleable()
-                    ->url(fn (Record $record): string => route('pages.show', ['slug' => $record->getSlug()])),
+                    ->url(fn (Record $record): string => route('pages.show', ['slug' => $record->fullSlug()])),
 
                 TextColumn::make('updated_at')
                     ->label('Updated')
+                    ->toggleable()
                     ->sortable()
                     ->since(),
             ])
@@ -218,5 +191,12 @@ class RecordResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['uuid'] = Str::orderedUuid();
+
+        return $data;
     }
 }

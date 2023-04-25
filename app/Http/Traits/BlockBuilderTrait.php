@@ -13,10 +13,24 @@ use FilamentTiptapEditor\TiptapEditor;
 use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\ViewField;
 use Illuminate\Support\Facades\Request;
 
 trait BlockBuilderTrait
 {
+    const FIELD_TYPES = [
+        'Filament\Forms\Components\TextInput' => 'text',
+        'Filament\Forms\Components\Textarea' => 'text',
+        'FilamentTiptapEditor\TiptapEditor' => 'rich_content',
+        'Filament\Forms\Components\Builder' => 'text',
+        'Filament\Forms\Components\Toggle' => 'boolean',
+        'Filament\Forms\Components\Select' => 'relation',
+        'Filament\Forms\Components\FileUpload' => 'files',
+        'Filament\Forms\Components\ColorPicker' => 'text',
+        'Creagia\FilamentCodeField\CodeField' => 'raw',
+    ];
+
     public static function getTaxonomyFields($page = null)
     {
         return Grid::make()
@@ -32,6 +46,19 @@ trait BlockBuilderTrait
         ]);
     }
 
+    public static function makeHiddenFields($field)
+    {
+        $result = [];
+        $name = Str::snake($field['name']);
+        $typeName = self::FIELD_TYPES[$field['type']];
+        $hidden = Hidden::make("data.$name.type")
+            ->afterStateHydrated(function (Hidden $component, $state) use ($typeName) {
+                $component->state($typeName);
+            });
+        array_push($result, $hidden);
+        return $result;
+    }
+
     public static function getTaxonomyFieldsByType($taxonomy_id)
     {
         $taxonomy = Taxonomy::find($taxonomy_id);
@@ -39,45 +66,41 @@ trait BlockBuilderTrait
         if ($taxonomy) {
             foreach ($taxonomy->fields as $field) {
                 $type = $field['type'];
-                $snaked = Str::snake($field['name']);
-                if (Str::contains($type, 'Builder')) {
-                    $fields = array_merge(
-                        $fields,
-                        self::getBlockBuilderFields("data.$snaked")
-                    );
-                } else {
-                    $component = $type::make("data.$snaked");
-                    if (method_exists($type, 'placeholder')) {
-                        $component->placeholder($field['name']);
-                    }
-                    if (Str::contains($type, 'ColorPicker')) {
-                        $component->rgba();
-                    }
-                    if (Str::contains($type, 'Select')) {
-                        $component
-                            ->columnSpanFull()
-                            ->searchable()
-                            ->multiple();
-                        $component->options(function () use ($field) {
-                            $ids = $field['relations'];
-                            return Record::whereIn('taxonomy_id', $ids)->get()->pluck('name', 'id');
-                        });
-                    }
-                    if (Str::contains($type, 'CodeField')) {
-                        $component
-                            ->htmlField()
-                            ->withLineNumbers();
-                    }
-                    if (self::isFullWidth($type)) {
-                        $component->columnSpanFull();
-                    }
-                    array_push(
-                        $fields,
-                        $component
-                    );
+                $name = Str::snake($field['name']);
+                $component = $type::make("data.$name.value");
+                $component->label($field['name']);
+                if (method_exists($type, 'placeholder')) {
+                    $component->placeholder($field['name']);
                 }
+                if (Str::contains($type, 'ColorPicker')) {
+                    $component->rgba();
+                }
+                if (Str::contains($type, 'Select')) {
+                    $component
+                        ->columnSpanFull()
+                        ->searchable()
+                        ->multiple();
+                    $component->options(function () use ($field) {
+                        $ids = $field['relations'];
+                        return Record::whereIn('taxonomy_id', $ids)->get()->pluck('name', 'id');
+                    });
+                }
+                if (Str::contains($type, 'CodeField')) {
+                    $component
+                        ->htmlField()
+                        ->withLineNumbers();
+                }
+                if (self::isFullWidth($type)) {
+                    $component->columnSpanFull();
+                }
+                array_push(
+                    $fields,
+                    $component
+                );
+                $fields = array_merge($fields, self::makeHiddenFields($field));
             }
         }
+        // dd($fields);
         return $fields;
     }
 

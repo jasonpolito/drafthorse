@@ -20,14 +20,8 @@ Route::get('/', function () {
 });
 
 Route::get('/{slug?}', function ($slug) {
-    $parts = explode('/', $slug);
-    $last = $parts[count($parts) - 1];
-    $page = Record::where('slug', $last)->with(['children', 'parent'])->first();
-    $page->buildTaxonomy();
-    return collect($page);
-    if ($page->getSlug() == $slug) {
-        return view('page', compact('page'));
-    } else {
-        abort(404);
-    }
+    $record = Record::findBySlug($slug);
+    $record->withRelations();
+    // return $record->getData();
+    return view('page', ['page' => $record]);
 })->name('pages.show')->where(['slug' => '.*']);

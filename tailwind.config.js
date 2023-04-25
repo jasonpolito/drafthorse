@@ -9,12 +9,22 @@ module.exports = {
     "./app/**/*.php",
     './vendor/filament/**/*.blade.php',
   ],
+  purge: {
+		options: {
+			safelist: 
+      [{
+        pattern: /^w-/,
+        variants: ['xl', 'lg', 'md', 'sm'],
+      }],
+		}
+  },
   darkMode: 'class',
   theme: {
     extend: {
       colors: {
         danger: colors.rose,
-        primary: colors.blue,
+        // primary: colors.lime,
+        primary: colors.green,
         success: colors.green,
         warning: colors.yellow,
       },
@@ -60,6 +70,6 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
+    require('@tailwindcss/typography')
   ],
 }

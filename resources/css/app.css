@@ -9,6 +9,7 @@
 .prose .btn {
     @apply inline-block px-5 py-3 my-6 text-white no-underline transition bg-blue-500 rounded shadow;
 }
+
 .prose .btn:last-child {
     @apply mb-0;
 }
@@ -67,4 +68,8 @@
     .lg\:prose-xl :where(tbody td, tfoot td):not(:where([class~="not-prose"] *)):not(:first-child) {
         padding: 0.8888889em 0.6666667em;
     }
+}
+
+.bg-fill {
+    @apply bg-center bg-cover;
 }
