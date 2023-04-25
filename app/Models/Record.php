@@ -169,7 +169,7 @@ class Record extends Model implements HasMedia
         return self::makeVariablesOptional(self::passDataToTemplate($str));
     }
 
-    public static function renderTemplate($markup, $data)
+    public static function renderTemplate($markup, $data = ['data' => []])
     {
         $markup = self::passDataToTemplate(self::makeVariablesOptional($markup));
         $dataObj = json_decode(json_encode($data['data']));
