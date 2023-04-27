@@ -13,6 +13,7 @@ use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -75,6 +76,44 @@ class TemplateResource extends Resource
                                                         'Filament\Forms\Components\ColorPicker' => 'Color Picker',
                                                         'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
                                                     ]),
+                                                Card::make()
+                                                    ->hidden(fn (Closure $get) => $get('type') != 'Filament\Forms\Components\Repeater')
+                                                    ->schema([
+                                                        Grid::make(2)
+                                                            ->schema([
+                                                                Repeater::make('fields')
+                                                                    ->columnSpan(2)
+                                                                    ->collapsed()
+                                                                    ->collapsible()
+                                                                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
+                                                                    ->orderable()
+                                                                    ->schema([
+                                                                        Grid::make(2)
+                                                                            ->schema([
+                                                                                TextInput::make('name')
+                                                                                    ->label('Field name')
+                                                                                    ->placeholder('Field name')
+                                                                                    ->required(),
+                                                                                Select::make('type')
+                                                                                    ->label('Field type')
+                                                                                    ->required()
+                                                                                    ->reactive()
+                                                                                    ->searchable()
+                                                                                    ->preload()
+                                                                                    ->options([
+                                                                                        'Filament\Forms\Components\TextInput' => 'Short Text',
+                                                                                        'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+                                                                                        'Filament\Forms\Components\FileUpload' => 'File Upload',
+                                                                                        'Filament\Forms\Components\Toggle' => 'Checkbox',
+                                                                                        'Filament\Forms\Components\Repeater' => 'Repeater',
+                                                                                        'Filament\Forms\Components\Select' => 'Relationship',
+                                                                                        'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+                                                                                        'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
+                                                                                    ]),
+                                                                            ])
+                                                                    ]),
+                                                            ])
+                                                    ])
                                             ])
                                     ])
                             ]),
