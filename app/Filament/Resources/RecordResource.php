@@ -78,15 +78,6 @@ class RecordResource extends Resource
                                             $set('slug', Str::slug($state));
                                         }
                                     })
-                                    // ->helperText(function (Closure $get, $record) {
-                                    //     if ($record) {
-                                    //         $domain = env('APP_URL');
-                                    //         $fullUrl = implode('/', [$domain, 'api', $record->uuid]);
-                                    //         return "<a href='$fullUrl'>$fullUrl</a>";
-                                    //     } else {
-                                    //         return '';
-                                    //     }
-                                    // })
                                     ->reactive()
                                     ->required()
                                     ->unique(ignorable: fn ($record) => $record),

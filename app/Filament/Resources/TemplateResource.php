@@ -6,12 +6,15 @@ use App\Filament\Resources\TemplateResource\Pages;
 use App\Filament\Resources\TemplateResource\RelationManagers;
 use App\Http\Traits\BlockBuilderTrait;
 use App\Models\Page;
+use App\Models\Taxonomy;
 use App\Models\Template;
+use Closure;
 use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -40,13 +43,45 @@ class TemplateResource extends Resource
                 Tabs::make('record')
                     ->columnSpan(2)
                     ->schema([
-                        Tab::make('Markup')
+                        Tab::make('Data')
+                            ->columnSpanFull()
+                            ->schema([
+                                Repeater::make('fields')
+                                    ->columnSpan(2)
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextInput::make('name')
+                                                    ->label('Field name')
+                                                    ->placeholder('Field name')
+                                                    ->required(),
+                                                Select::make('type')
+                                                    ->label('Field type')
+                                                    ->required()
+                                                    ->reactive()
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->options([
+                                                        'Filament\Forms\Components\TextInput' => 'Short Text',
+                                                        'Filament\Forms\Components\Textarea' => 'Long Text',
+                                                        'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+                                                        'Filament\Forms\Components\FileUpload' => 'File Upload',
+                                                        'Filament\Forms\Components\Select' => 'Relationship',
+                                                        'Filament\Forms\Components\Toggle' => 'Checkbox',
+                                                        'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+                                                        'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
+                                                    ]),
+                                            ])
+                                    ])
+                            ]),
+
+                        Tab::make('View')
                             ->columnSpanFull()
                             ->schema([
                                 CodeField::make('markup')
                                     ->withLineNumbers()
                                     ->htmlField()
-                            ])
+                            ]),
                     ]),
                 Card::make()
                     ->columnSpan(1)

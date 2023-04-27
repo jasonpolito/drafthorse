@@ -6,16 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 
-class Record extends Model implements HasMedia
+class Record extends Model
 {
-    use HasFactory, SoftDeletes, InteractsWithMedia;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -85,15 +81,6 @@ class Record extends Model implements HasMedia
                 $data[$name] = collect($records);
                 $this->data = (object) $data;
             }
-        }
-    }
-
-    public function getBlocks()
-    {
-        if ($this->template()->exists()) {
-            return $this->template->replaceTokens($this, $this->template->blocks);
-        } else {
-            return [];
         }
     }
 
@@ -169,11 +156,20 @@ class Record extends Model implements HasMedia
         return self::makeVariablesOptional(self::passDataToTemplate($str));
     }
 
-    public static function renderTemplate($markup, $data = ['data' => []])
+    public static function renderTemplate($markup, $data = ['data' => []], $die = false)
     {
         $markup = self::passDataToTemplate(self::makeVariablesOptional($markup));
         $dataObj = json_decode(json_encode($data['data']));
         return Blade::render($markup, ['data' => $dataObj]);
+    }
+
+    public static function getValueData($data)
+    {
+        $res = [];
+        foreach ($data as $name => $info) {
+            $res[$name] = $info->value;
+        }
+        return $res;
     }
 
     public function getData()
@@ -188,7 +184,10 @@ class Record extends Model implements HasMedia
         });
         foreach ($this->data as $name => $info) {
             if (is_array($info)) {
-                $res[$name] = $info['value'];
+                $res[$name] = [
+                    'value' => $info['value'],
+                    'type' => $info['type']
+                ];
             }
         }
         return $res;

@@ -4,6 +4,7 @@ namespace App\Http\Traits;
 
 use App\Models\Record;
 use App\Models\Taxonomy;
+use App\Models\Template;
 use Closure;
 use Filament\Forms\Components\Builder as BlockBuilder;
 use Filament\Forms\Components\Builder\Block;
@@ -15,6 +16,8 @@ use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\ViewField;
 use Illuminate\Support\Facades\Request;
 
@@ -23,11 +26,14 @@ trait BlockBuilderTrait
     const FIELD_TYPES = [
         'Filament\Forms\Components\TextInput' => 'text',
         'Filament\Forms\Components\Textarea' => 'text',
-        'FilamentTiptapEditor\TiptapEditor' => 'rich_content',
         'Filament\Forms\Components\Builder' => 'text',
+        'blocks' => 'blocks',
+        'FilamentTiptapEditor\TiptapEditor' => 'rich_content',
         'Filament\Forms\Components\Toggle' => 'boolean',
         'Filament\Forms\Components\Select' => 'relation',
         'Filament\Forms\Components\FileUpload' => 'files',
+        'Filament\Forms\Components\SpatieMediaLibraryFileUpload' => 'files',
+        'Awcodes\Curator\Components\Forms\CuratorPicker' => 'files',
         'Filament\Forms\Components\ColorPicker' => 'text',
         'Creagia\FilamentCodeField\CodeField' => 'raw',
     ];
@@ -38,10 +44,32 @@ trait BlockBuilderTrait
             ->schema(fn (Closure $get) => self::getTaxonomyFieldsByType($get('taxonomy_id')));
     }
 
+    public static function getTemplateFields($parent): array
+    {
+        $fields = [];
+        $templates = Template::orderBy('id', 'desc')->get();
+        foreach ($templates as $template) {
+            $templateFields = $template->fields;
+            if (is_array($templateFields)) {
+                foreach ($templateFields as $templateField) {
+                    $type = $templateField['type'];
+                    $name = Str::snake($templateField['name']);
+                    $component = $type::make("data.$name.value");
+                    $component->hidden(fn (Closure $get) => $get($parent) != $template->id);
+                    $component->label($templateField['name']);
+                    array_push($fields, $component);
+                }
+            }
+        }
+        // dd($fields);
+        return $fields;
+    }
+
     public static function isFullWidth($type)
     {
         return in_array($type, [
             'FilamentTiptapEditor\TiptapEditor',
+            'blocks',
             'Filament\Forms\Components\Builder',
             'Creagia\FilamentCodeField\CodeField'
         ]);
@@ -68,7 +96,22 @@ trait BlockBuilderTrait
             foreach ($taxonomy->fields as $field) {
                 $type = $field['type'];
                 $name = Str::snake($field['name']);
-                $component = $type::make("data.$name.value");
+                if ($field['type'] == 'blocks') {
+                    $component = Repeater::make("data.$name.value")
+                        ->schema(array_merge(
+                            [
+                                Select::make('template')
+                                    ->reactive()
+                                    ->options(function () {
+                                        return Template::all()->pluck('name', 'id');
+                                    }),
+
+                            ],
+                            self::getTemplateFields("template")
+                        ));
+                } else {
+                    $component = $type::make("data.$name.value");
+                }
                 $component->label($field['name']);
                 if (method_exists($type, 'placeholder')) {
                     $component->placeholder($field['name']);

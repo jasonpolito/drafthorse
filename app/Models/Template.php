@@ -13,12 +13,14 @@ class Template extends Model
 
     protected $fillable = [
         'name',
+        'fields',
         'markup',
     ];
     protected $guarded = ['id'];
 
     protected $casts = [
         'blocks' => 'array',
+        'fields' => 'array',
     ];
 
     public const FIELD_TYPES = [
@@ -29,7 +31,8 @@ class Template extends Model
             'FilamentTiptapEditor\TiptapEditor',
         ],
         'image' => [
-            'Filament\Forms\Components\FileUpload'
+            'Awcodes\Curator\Components\Forms\CuratorPicker',
+            'Filament\Forms\Components\FileUpload',
         ],
         'color' => [
             'Filament\Forms\Components\ColorPicker'
@@ -52,29 +55,6 @@ class Template extends Model
             }
         }
         return $options;
-    }
-
-    public function replaceTokens(Record $record, $blocks = null): array
-    {
-        $jsonString = json_encode($blocks);
-        foreach ($page->taxonomy->fields as $field) {
-            $token = Str::snake($field['name']);
-            $content = $page->data[$token] ?? false;
-            // dd($content);
-            if ($content && !is_array($content)) {
-                if (Str::contains('<script', $content)) {
-                    $replace = addcslashes($content, '"');
-                } else {
-                    $replace = addcslashes(preg_replace('/\v+|\\\r\\\n/Ui', '<br/>', $content), '"');
-                }
-                $jsonString = Str::replace("{{ $token }}", $replace, $jsonString);
-            }
-        }
-
-        $cleansed = $this->cleanseContent($jsonString);
-
-        $blocks = (array) json_decode($cleansed, true);
-        return $blocks;
     }
 
     public function cleanseContent($content): string
