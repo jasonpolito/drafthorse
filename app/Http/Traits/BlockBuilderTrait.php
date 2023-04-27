@@ -64,6 +64,7 @@ trait BlockBuilderTrait
                         $repeater = Repeater::make("data.$name.value")
                             ->columnSpan(2)
                             ->label($templateField['name'])
+                            ->cloneable()
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
                             ->orderable()

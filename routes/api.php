@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/records', function () {
     return new RecordsCollection(Record::all());
 });
-Route::get('/pages/{id}', function ($id) {
+Route::get('/records/{id}', function ($id) {
     return new RecordsCollection(Record::where('id', $id));
 });
 // });
