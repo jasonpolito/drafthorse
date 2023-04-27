@@ -58,7 +58,28 @@ trait BlockBuilderTrait
                     $component->hidden(fn (Closure $get) => $get($parent) != $template->id);
                     $component->label($templateField['name'])
                         ->reactive();
-                    array_push($fields, $component);
+                    if (Str::contains($type, 'repeater', true)) {
+                        // dd($templateField);
+                        $schema = [];
+                        $repeater = Repeater::make("data.$name.value")
+                            ->columnSpan(2)
+                            ->label($templateField['name'])
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
+                            ->orderable()
+                            ->schema([$component]);
+                        foreach ($templateField['fields'] as $repeaterField) {
+                            $type = $repeaterField['type'];
+                            $name = Str::snake($repeaterField['name']);
+                            $repeaterComponent = $type::make("$name");
+                            $repeaterComponent->label($repeaterField['name'])
+                                ->reactive();
+                            array_push($schema, $repeaterComponent);
+                        }
+                        // dd($schema);
+                        $repeater->schema($schema);
+                    }
+                    array_push($fields, $repeater ?? $component);
                 }
             }
         }
