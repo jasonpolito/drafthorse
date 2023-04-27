@@ -50,7 +50,7 @@ class TemplateResource extends Resource
                                     ->columnSpan(2)
                                     ->collapsed()
                                     ->collapsible()
-                                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? count($state['fields']))
+                                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
                                     ->orderable()
                                     ->schema([
                                         Grid::make(2)
@@ -67,11 +67,11 @@ class TemplateResource extends Resource
                                                     ->preload()
                                                     ->options([
                                                         'Filament\Forms\Components\TextInput' => 'Short Text',
-                                                        'Filament\Forms\Components\Textarea' => 'Long Text',
                                                         'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
                                                         'Filament\Forms\Components\FileUpload' => 'File Upload',
-                                                        'Filament\Forms\Components\Select' => 'Relationship',
                                                         'Filament\Forms\Components\Toggle' => 'Checkbox',
+                                                        'Filament\Forms\Components\Repeater' => 'Repeater',
+                                                        'Filament\Forms\Components\Select' => 'Relationship',
                                                         'Filament\Forms\Components\ColorPicker' => 'Color Picker',
                                                         'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
                                                     ]),

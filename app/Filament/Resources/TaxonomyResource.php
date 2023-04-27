@@ -55,6 +55,10 @@ class TaxonomyResource extends Resource
                             ->schema([
                                 Repeater::make('fields')
                                     ->columnSpan(2)
+                                    ->collapsed()
+                                    ->collapsible()
+                                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
+                                    ->orderable()
                                     ->schema([
                                         Grid::make(2)
                                             ->schema([
