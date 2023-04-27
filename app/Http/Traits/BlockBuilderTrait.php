@@ -56,7 +56,8 @@ trait BlockBuilderTrait
                     $name = Str::snake($templateField['name']);
                     $component = $type::make("data.$name.value");
                     $component->hidden(fn (Closure $get) => $get($parent) != $template->id);
-                    $component->label($templateField['name']);
+                    $component->label($templateField['name'])
+                        ->reactive();
                     array_push($fields, $component);
                 }
             }
@@ -98,6 +99,10 @@ trait BlockBuilderTrait
                 $name = Str::snake($field['name']);
                 if ($field['type'] == 'blocks') {
                     $component = Repeater::make("data.$name.value")
+                        ->collapsible()
+                        ->collapsed()
+                        ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['data']['title']['value'] ?? null)
+                        ->orderable()
                         ->schema(array_merge(
                             [
                                 Select::make('template')

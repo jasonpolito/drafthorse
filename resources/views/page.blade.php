@@ -1,5 +1,5 @@
 @php
-    // dd($record->getData());
+    // dd($record->data['template']);
 @endphp
 @php ob_start(); @endphp
 @php

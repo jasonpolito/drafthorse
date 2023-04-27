@@ -148,6 +148,7 @@ class Record extends Model
 
     public static function passDataToTemplate($str)
     {
+        $str = Str::replace('<x-blocks', '<x-blocks :$data ', $str);
         return Str::replace('<x-template', '<x-template :$data ', $str);
     }
 

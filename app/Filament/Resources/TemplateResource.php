@@ -48,6 +48,10 @@ class TemplateResource extends Resource
                             ->schema([
                                 Repeater::make('fields')
                                     ->columnSpan(2)
+                                    ->collapsed()
+                                    ->collapsible()
+                                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? count($state['fields']))
+                                    ->orderable()
                                     ->schema([
                                         Grid::make(2)
                                             ->schema([
