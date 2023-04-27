@@ -49,7 +49,7 @@ class TemplateResource extends Resource
                             ->schema([
                                 Repeater::make('fields')
                                     ->columnSpan(2)
-                                    ->collapsed()
+                                    // ->collapsed()
                                     ->collapsible()
                                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
                                     ->orderable()
@@ -83,7 +83,7 @@ class TemplateResource extends Resource
                                                             ->schema([
                                                                 Repeater::make('fields')
                                                                     ->columnSpan(2)
-                                                                    ->collapsed()
+                                                                    // ->collapsed()
                                                                     ->collapsible()
                                                                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
                                                                     ->orderable()

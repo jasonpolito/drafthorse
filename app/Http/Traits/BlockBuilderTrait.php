@@ -122,7 +122,7 @@ trait BlockBuilderTrait
                 if ($field['type'] == 'blocks') {
                     $component = Repeater::make("data.$name.value")
                         ->collapsible()
-                        ->collapsed()
+                        // ->collapsed()
                         ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['data']['title']['value'] ?? null)
                         ->orderable()
                         ->schema(array_merge(
