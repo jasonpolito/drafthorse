@@ -43,11 +43,6 @@ class Record extends Model
         return $this->belongsTo(Taxonomy::class);
     }
 
-    public function template()
-    {
-        return $this->belongsTo(Template::class);
-    }
-
     public function parent()
     {
         return $this->belongsTo(Record::class);
@@ -146,7 +141,7 @@ class Record extends Model
         return $res;
     }
 
-    public static function passDataToTemplate($str)
+    public static function passDataToMarkup($str)
     {
         $str = Str::replace('<x-blocks', '<x-blocks :$data ', $str);
         return Str::replace('<x-template', '<x-template :$data ', $str);
@@ -154,12 +149,12 @@ class Record extends Model
 
     public static function parseContent($str)
     {
-        return self::makeVariablesOptional(self::passDataToTemplate($str));
+        return self::makeVariablesOptional(self::passDataToMarkup($str));
     }
 
-    public static function renderTemplate($markup, $data = ['data' => []], $die = false)
+    public static function renderMarkup($markup, $data = ['data' => []], $die = false)
     {
-        $markup = self::passDataToTemplate(self::makeVariablesOptional($markup));
+        $markup = self::passDataToMarkup(self::makeVariablesOptional($markup));
         $dataObj = json_decode(json_encode($data['data']));
         return Blade::render($markup, ['data' => $dataObj]);
     }
@@ -177,6 +172,7 @@ class Record extends Model
     {
         $res = [];
         $res['name'] = $this->name;
+        $res['markup'] = $this->data['markup'];
         $res['children'] = $this->children()->get()->map(function ($item) {
             $data = $item->getData();
             $item->full_slug = $item->fullSlug();

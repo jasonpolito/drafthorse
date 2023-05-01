@@ -5,9 +5,9 @@
         @foreach ($data->$name->value as $item)
             @php
                 $data = App\Models\Record::getValueData($item->data);
-                $template = App\Models\Template::find($item->template);
+                $block = App\Models\Block::find($item->block);
             @endphp
-            {!! App\Models\Record::renderTemplate($template->markup, ['data' => $data], true) !!}
+            {!! App\Models\Record::renderMarkup($block->markup, ['data' => $data], true) !!}
         @endforeach
     @endif
 @endif

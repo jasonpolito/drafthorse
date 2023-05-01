@@ -102,7 +102,7 @@
 
 <body>
     <div class="bg-primary-500"></div>
-    @yield('content')
+    @content
     @if (auth()->user())
         <div class="fixed bottom-0 right-0 z-50 p-4"><a
                href="{{ route('filament.resources.records.edit', ['record' => $record]) }}"
@@ -114,12 +114,3 @@
 </body>
 
 </html>
-
-
-<x-section>
-    <x-container>
-        <x-prose>
-            <h1>{{ $data-> }}</h1>
-        </x-prose>
-    </x-container>
-</x-section>

@@ -6,9 +6,10 @@
     $layout = explode('@content', App\Models\Layout::find($record->data['layout'])->markup);
     $start = Str::replace('<x-template ', '<x-template :$data ', $layout[0]);
     $end = $layout[1];
+    // dd($data);
 @endphp
 {!! $start !!}
-{!! App\Models\Record::renderTemplate($record->data['template'], ['data' => $record->getData()]) !!}
+{!! App\Models\Record::renderMarkup($record->data['markup'], ['data' => $record->getData()]) !!}
 {!! $end !!}
 @php
     $markup = ob_get_contents();

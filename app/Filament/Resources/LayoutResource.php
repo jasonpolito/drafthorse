@@ -50,7 +50,7 @@ class LayoutResource extends Resource
                             ->schema([
                                 TextInput::make('name')
                                     ->columnSpanFull()
-                                    ->placeholder('Template name')
+                                    ->placeholder('Layout name')
                                     ->reactive()
                                     ->required()
                                     ->unique(ignorable: fn ($record) => $record),

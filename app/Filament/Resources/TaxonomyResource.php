@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TaxonomyResource\Pages;
 use App\Filament\Resources\TaxonomyResource\RelationManagers;
+use App\Models\Block;
 use App\Models\Taxonomy;
 use App\Models\User;
 use Closure;
@@ -55,7 +56,6 @@ class TaxonomyResource extends Resource
                             ->schema([
                                 Repeater::make('fields')
                                     ->columnSpan(2)
-                                    ->collapsed()
                                     ->collapsible()
                                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                                     ->orderable()

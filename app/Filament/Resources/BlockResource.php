@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TemplateResource\Pages;
-use App\Filament\Resources\TemplateResource\RelationManagers;
+use App\Filament\Resources\BlockResource\Pages;
+use App\Filament\Resources\BlockResource\RelationManagers;
 use App\Http\Traits\BlockBuilderTrait;
 use App\Models\Page;
 use App\Models\Taxonomy;
-use App\Models\Template;
+use App\Models\Block;
 use Closure;
 use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms;
@@ -27,11 +27,11 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\View;
 
-class TemplateResource extends Resource
+class BlockResource extends Resource
 {
     use BlockBuilderTrait;
 
-    protected static ?string $model = Template::class;
+    protected static ?string $model = Block::class;
     protected static ?string $navigationGroup = 'Views';
     protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $recordTitleAttribute = 'name';
@@ -133,7 +133,7 @@ class TemplateResource extends Resource
                             ->schema([
                                 TextInput::make('name')
                                     ->columnSpanFull()
-                                    ->placeholder('Template name')
+                                    ->placeholder('Block name')
                                     ->reactive()
                                     ->required()
                                     ->unique(ignorable: fn ($record) => $record),
@@ -177,9 +177,9 @@ class TemplateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTemplates::route('/'),
-            'create' => Pages\CreateTemplate::route('/create'),
-            'edit' => Pages\EditTemplate::route('/{record}/edit'),
+            'index' => Pages\ListBlocks::route('/'),
+            'create' => Pages\CreateBlock::route('/create'),
+            'edit' => Pages\EditBlock::route('/{record}/edit'),
         ];
     }
 

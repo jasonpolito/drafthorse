@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\TemplateResource\Pages;
+namespace App\Filament\Resources\BlockResource\Pages;
 
-use App\Filament\Resources\TemplateResource;
+use App\Filament\Resources\BlockResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditTemplate extends EditRecord
+class EditBlock extends EditRecord
 {
-    protected static string $resource = TemplateResource::class;
+    protected static string $resource = BlockResource::class;
 
     protected function getActions(): array
     {

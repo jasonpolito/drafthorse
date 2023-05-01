@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class Template extends Model
+class Block extends Model
 {
     use HasFactory, SoftDeletes;
 

@@ -59,7 +59,7 @@ class RecordResource extends Resource
                                     ->options(function (?Record $record) {
                                         return Layout::all()->pluck('name', 'id');
                                     }),
-                                CodeField::make('data.template')
+                                CodeField::make('data.markup')
                                     ->withLineNumbers()
                                     ->htmlField()
                             ])

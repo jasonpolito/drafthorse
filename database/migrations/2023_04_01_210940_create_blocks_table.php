@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('templates', function (Blueprint $table) {
-            $table->dropColumn('blocks');
+        Schema::create('blocks', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->softDeletes();
+            $table->string('name')->unique();
+            $table->json('fields')->nullable();
+            $table->longText('markup')->nullable();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('templates', function (Blueprint $table) {
-            $table->json('blocks')->nullable();
-        });
+        Schema::dropIfExists('blocks');
     }
 };
