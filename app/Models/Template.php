@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Template extends Model
@@ -38,6 +39,18 @@ class Template extends Model
             'Filament\Forms\Components\ColorPicker'
         ],
     ];
+
+
+    public static function boot()
+    {
+        parent::boot();
+        self::saved(
+            function (Model $model) {
+                Log::info($model->getOriginal());
+                Log::info($model);
+            }
+        );
+    }
 
     public function getFieldOptions($type = false): array
     {

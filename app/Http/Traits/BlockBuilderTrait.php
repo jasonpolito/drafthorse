@@ -61,6 +61,7 @@ trait BlockBuilderTrait
                     if (Str::contains($type, 'repeater', true)) {
                         // dd($templateField);
                         $schema = [];
+                        // dd($name);
                         $repeater = Repeater::make("data.$name.value")
                             ->columnSpan(2)
                             ->label($templateField['name'])
@@ -173,60 +174,5 @@ trait BlockBuilderTrait
         }
         // dd($fields);
         return $fields;
-    }
-
-    public static function getBlockBuilderFields($name = null)
-    {
-        $name = $name ?? 'blocks';
-        return [
-            Grid::make(1)
-                ->schema([
-                    BlockBuilder::make($name)
-                        ->createItemButtonLabel('Add Block')
-                        ->label(false)
-                        ->columnSpan(2)
-                        ->collapsible()
-                        ->blocks([
-                            Block::make('hero')
-                                ->label('Hero')
-                                ->icon('heroicon-o-pencil-alt')
-                                ->schema([
-                                    TiptapEditor::make('content')
-                                        ->label(false)
-                                        ->profile('simple'),
-                                ]),
-                            Block::make('rich_content')
-                                ->label('Text Content')
-                                ->icon('heroicon-o-pencil-alt')
-                                ->schema([
-                                    TiptapEditor::make('content')
-                                        ->label(false)
-                                ]),
-                            Block::make('big_image')
-                                ->label('Big Image')
-                                ->icon('heroicon-o-pencil-alt')
-                                ->schema([
-                                    FileUpload::make('content')
-                                    // ->label('false')
-                                ]),
-                            Block::make('blocks')
-                                ->label('Render Blocks')
-                                ->icon('heroicon-o-code')
-                                ->schema([
-                                    TextInput::make('content')
-                                        ->label('Render Blocks')
-                                ]),
-                            Block::make('code')
-                                ->label('Raw Code')
-                                ->icon('heroicon-o-code')
-                                ->schema([
-                                    CodeField::make('content')
-                                        ->label('Raw Code')
-                                        ->htmlField()
-                                        ->withLineNumbers()
-                                ]),
-                        ])
-                ])
-        ];
     }
 }
