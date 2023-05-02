@@ -1,1 +1,0 @@
-{!! $attributes['data']['content'] !!}

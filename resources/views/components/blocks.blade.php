@@ -1,5 +1,4 @@
 @props(['name', 'data'])
-{{-- {{ dd($name) }} --}}
 @if (isset($data->$name))
     @if ($data->$name->type == 'blocks')
         @foreach ($data->$name->value as $item)

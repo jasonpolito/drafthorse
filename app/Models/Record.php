@@ -141,10 +141,14 @@ class Record extends Model
         return $res;
     }
 
-    public static function passDataToMarkup($str)
+    public static function passDataToMarkup($str, $die)
     {
-        $str = Str::replace('<x-blocks', '<x-blocks :$data ', $str);
-        return Str::replace('<x-template', '<x-template :$data ', $str);
+        $str = Str::replace('<x-blocks ', '<x-blocks :$data ', $str);
+        $str = Str::replace('<x-block ', '<x-block :$data ', $str);
+        // if ($die) {
+        //     dd($str);
+        // }
+        return $str;
     }
 
     public static function parseContent($str)
@@ -154,7 +158,7 @@ class Record extends Model
 
     public static function renderMarkup($markup, $data = ['data' => []], $die = false)
     {
-        $markup = self::passDataToMarkup(self::makeVariablesOptional($markup));
+        $markup = self::passDataToMarkup(self::makeVariablesOptional($markup), $die);
         $dataObj = json_decode(json_encode($data['data']));
         return Blade::render($markup, ['data' => $dataObj]);
     }
