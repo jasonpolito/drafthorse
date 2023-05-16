@@ -51,7 +51,7 @@ class RecordResource extends Resource
                                 array_merge([], [self::getTaxonomyFields()])
 
                             ),
-                        Tab::make('View')
+                        Tab::make('Markup')
                             ->schema([
                                 Select::make('data.layout')
                                     ->default(1)

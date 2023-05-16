@@ -58,11 +58,11 @@ class BlockResource extends Resource
                                             ->schema([
                                                 TextInput::make('name')
                                                     ->label('Field name')
-                                                    ->placeholder('Field name')
-                                                    ->required(),
+                                                    ->placeholder('Field name'),
+                                                // ->required(),
                                                 Select::make('type')
                                                     ->label('Field type')
-                                                    ->required()
+                                                    // ->required()
                                                     ->reactive()
                                                     ->searchable()
                                                     ->preload()
@@ -76,6 +76,18 @@ class BlockResource extends Resource
                                                         'Filament\Forms\Components\ColorPicker' => 'Color Picker',
                                                         'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
                                                     ]),
+
+                                                Select::make('relations')
+                                                    ->hidden(fn (Closure $get, $state) => $get('type') !== 'Filament\Forms\Components\Select')
+                                                    ->label('Select Relation(s)')
+                                                    ->placeholder('Select Relation(s)')
+                                                    ->columnSpan(2)
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->multiple()
+                                                    ->options(function () {
+                                                        return Taxonomy::all()->pluck('name', 'id');
+                                                    }),
                                                 Card::make()
                                                     ->hidden(fn (Closure $get) => $get('type') != 'Filament\Forms\Components\Repeater')
                                                     ->schema([
@@ -118,7 +130,7 @@ class BlockResource extends Resource
                                     ])
                             ]),
 
-                        Tab::make('View')
+                        Tab::make('Markup')
                             ->columnSpanFull()
                             ->schema([
                                 CodeField::make('markup')

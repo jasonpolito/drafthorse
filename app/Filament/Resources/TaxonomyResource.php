@@ -76,6 +76,7 @@ class TaxonomyResource extends Resource
                                                         'Filament\Forms\Components\TextInput' => 'Short Text',
                                                         'Filament\Forms\Components\Textarea' => 'Long Text',
                                                         'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+                                                        'AskerAkbar\GptTrixEditor\Components\GptTrixEditor' => 'GPT Text',
                                                         'Filament\Forms\Components\FileUpload' => 'File Upload',
                                                         'Filament\Forms\Components\Select' => 'Relationship',
                                                         'blocks' => 'Blocks',

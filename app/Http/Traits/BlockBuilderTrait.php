@@ -11,7 +11,6 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Str;
 use FilamentTiptapEditor\TiptapEditor;
 use Creagia\FilamentCodeField\CodeField;
-use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
@@ -19,6 +18,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\ViewField;
 use Illuminate\Support\Facades\Request;
+use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 
 trait BlockBuilderTrait
 {
@@ -26,6 +26,7 @@ trait BlockBuilderTrait
         'Filament\Forms\Components\TextInput' => 'text',
         'Filament\Forms\Components\Textarea' => 'text',
         'Filament\Forms\Components\Builder' => 'text',
+        'AskerAkbar\GptTrixEditor\Components\GptTrixEditor' => 'text',
         'blocks' => 'blocks',
         'FilamentTiptapEditor\TiptapEditor' => 'rich_content',
         'Filament\Forms\Components\Toggle' => 'boolean',
@@ -39,31 +40,37 @@ trait BlockBuilderTrait
 
     public static function getTaxonomyFields($page = null)
     {
-        return Grid::make()
+        return Grid::make(1)
             ->schema(fn (Closure $get) => self::getTaxonomyFieldsByType($get('taxonomy_id')));
     }
 
     public static function getBlockFields($parent): array
     {
         $fields = [];
+        // dd($parent);
         $blocks = Block::orderBy('id', 'desc')->get();
         foreach ($blocks as $block) {
             $blockFields = $block->fields;
+            // dd($blockFields);
             if (is_array($blockFields)) {
                 foreach ($blockFields as $blockField) {
                     $type = $blockField['type'];
+                    // dd($blockField);
+                    // dd($type);
+                    if (!$type) continue;
                     $name = Str::snake($blockField['name']);
                     $component = $type::make("data.$name.value");
                     $component->hidden(fn (Closure $get) => $get($parent) != $block->id);
                     $component->label($blockField['name'])
-                        ->columnSpan(2)
+                        ->columnSpan('full')
                         ->reactive();
                     if (Str::contains($type, 'repeater', true)) {
                         $schema = [];
                         $repeater = Repeater::make("data.$name.value")
-                            ->columnSpan(2)
                             ->label($blockField['name'])
                             ->cloneable()
+                            ->hidden(fn (Closure $get) => $get($parent) != $block->id)
+                            ->columnSpan('full')
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => ($state['type'] ?? $state['title'] ?? null))
                             ->orderable()
@@ -76,25 +83,13 @@ trait BlockBuilderTrait
                                 ->reactive();
                             array_push($schema, $repeaterComponent);
                         }
-                        // dd($schema);
                         $repeater->schema($schema);
                     }
                     array_push($fields, $repeater ?? $component);
                 }
             }
         }
-        // dd($fields);
         return $fields;
-    }
-
-    public static function isFullWidth($type)
-    {
-        return in_array($type, [
-            'FilamentTiptapEditor\TiptapEditor',
-            'blocks',
-            'Filament\Forms\Components\Builder',
-            'Creagia\FilamentCodeField\CodeField'
-        ]);
     }
 
     public static function makeHiddenFields($field)
@@ -110,6 +105,36 @@ trait BlockBuilderTrait
         return $result;
     }
 
+    public static function configureAdditionalFieldSetup($field, $component)
+    {
+        $type = $field['type'];
+        if (method_exists($type, 'placeholder')) {
+            $component->placeholder($field['name']);
+        }
+        if (Str::contains($type, 'ColorPicker')) {
+            $component->rgba()
+                ->extraAttributes(['class' => 'w-60 float-right'])
+                ->inlineLabel();
+        }
+        if (Str::contains($type, 'FileUpload')) {
+            $component->inlineLabel();
+        }
+        if (Str::contains($type, 'Select')) {
+            $component
+                ->searchable()
+                ->multiple();
+            $component->options(function () use ($field) {
+                $ids = $field['relations'];
+                return Record::whereIn('taxonomy_id', $ids)->get()->pluck('name', 'id');
+            });
+        }
+        if (Str::contains($type, 'CodeField')) {
+            $component
+                ->htmlField()
+                ->withLineNumbers();
+        }
+    }
+
     public static function getTaxonomyFieldsByType($taxonomy_id)
     {
         $taxonomy = Taxonomy::find($taxonomy_id);
@@ -119,16 +144,18 @@ trait BlockBuilderTrait
             foreach ($taxonomy->fields as $field) {
                 $type = $field['type'];
                 $name = Str::snake($field['name']);
+
                 if ($field['type'] == 'blocks') {
                     $component = Repeater::make("data.$name.value")
                         ->collapsible()
+                        ->columnSpan('full')
                         ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['data']['title']['value'] ?? null)
                         ->orderable()
                         ->schema(array_merge(
                             [
                                 Select::make('block')
                                     ->reactive()
-                                    ->columnSpan(2)
+                                    ->columnSpan('full')
                                     ->options(function () {
                                         return Block::all()->pluck('name', 'id');
                                     }),
@@ -138,32 +165,13 @@ trait BlockBuilderTrait
                         ));
                 } else {
                     $component = $type::make("data.$name.value")
-                        ->columnSpan(2);
+                        ->columnSpan('full');
                 }
                 $component->label($field['name']);
-                if (method_exists($type, 'placeholder')) {
-                    $component->placeholder($field['name']);
-                }
-                if (Str::contains($type, 'ColorPicker')) {
-                    $component->rgba();
-                }
-                if (Str::contains($type, 'Select')) {
-                    $component
-                        ->searchable()
-                        ->multiple();
-                    $component->options(function () use ($field) {
-                        $ids = $field['relations'];
-                        return Record::whereIn('taxonomy_id', $ids)->get()->pluck('name', 'id');
-                    });
-                }
-                if (Str::contains($type, 'CodeField')) {
-                    $component
-                        ->htmlField()
-                        ->withLineNumbers();
-                }
-                if (self::isFullWidth($type)) {
-                    $component->columnSpan(2);
-                }
+
+                // add field specific attributes
+                self::configureAdditionalFieldSetup($field, $component);
+
                 array_push(
                     $fields,
                     $component
@@ -171,7 +179,6 @@ trait BlockBuilderTrait
                 $fields = array_merge($fields, self::makeHiddenFields($field));
             }
         }
-        // dd($fields);
         return $fields;
     }
 }

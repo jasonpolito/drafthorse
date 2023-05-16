@@ -141,13 +141,10 @@ class Record extends Model
         return $res;
     }
 
-    public static function passDataToMarkup($str, $die)
+    public static function passDataToMarkup($str)
     {
         $str = Str::replace('<x-blocks ', '<x-blocks :$data ', $str);
         $str = Str::replace('<x-block ', '<x-block :$data ', $str);
-        // if ($die) {
-        //     dd($str);
-        // }
         return $str;
     }
 
@@ -156,9 +153,9 @@ class Record extends Model
         return self::makeVariablesOptional(self::passDataToMarkup($str));
     }
 
-    public static function renderMarkup($markup, $data = ['data' => []], $die = false)
+    public static function renderMarkup($markup, $data = ['data' => []])
     {
-        $markup = self::passDataToMarkup(self::makeVariablesOptional($markup), $die);
+        $markup = self::passDataToMarkup(self::makeVariablesOptional($markup));
         $dataObj = json_decode(json_encode($data['data']));
         return Blade::render($markup, ['data' => $dataObj]);
     }
@@ -184,13 +181,22 @@ class Record extends Model
             return $item;
         });
         foreach ($this->data as $name => $info) {
-            if (is_array($info)) {
-                $res[$name] = [
-                    'value' => $info['value'],
-                    'type' => $info['type']
-                ];
+            if (isset($info['value'])) {
+                if (is_array($info['value'])) {
+                    $res[$name] = [
+                        'value' => $info['value'],
+                        'type' => $info['type']
+                    ];
+                } else {
+                    $res[$name] = $info['value'];
+                }
             }
         }
         return $res;
+    }
+
+    public function siblings()
+    {
+        return $this->parent->children()->where('id', '!=', $this->id)->get();
     }
 }

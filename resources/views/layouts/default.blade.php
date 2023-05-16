@@ -113,3 +113,17 @@
 </body>
 
 </html>
+
+
+<section class="py-16 bg-white sm:py-20 lg:py-24 xl:py-28">
+    <div class="container px-6 mx-auto sm:px-8 md:px-10 lg:px-14">
+        <h3
+            class="mb-4 text-3xl font-bold text-center font-title leading-12 sm:leading-12 md:leading-14 aos-init aos-animate last:mb-0 sm:text-4xl md:mb-8 md:text-5xl">
+            Save $24 with yearly billing
+        </h3>
+        <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+        <stripe-pricing-table pricing-table-id="prctbl_1N46N5F3qCHGIdxq3PdGMy45"
+                              publishable-key="pk_live_51N3krSF3qCHGIdxqhTv0kt9h6NF4qM46N2sfDZZv7B22hYvgh1tBrcrlOXhF8CDrLiGi90gAtn3V7JT2TmH96m0w00GRc4iSp2">
+        </stripe-pricing-table>
+    </div>
+</section>
