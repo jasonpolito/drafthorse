@@ -164,9 +164,28 @@ class Record extends Model
     {
         $res = [];
         foreach ($data as $name => $info) {
-            $res[$name] = $info->value;
+            if (is_array($info->value)) {
+                if (!empty($info->value)) {
+                    $res[$name] = [];
+                    foreach ($info->value as $nestedValue) {
+                        // dd($nestedValue->data);
+                        $nestedMap = [];
+                        foreach ($nestedValue->data as $nestedName => $nestedData) {
+                            $nestedMap[$nestedName] = $nestedData->value;
+                        }
+                        // dd($nestedMap);
+                        $res[$name][] = $nestedMap;
+                    }
+                }
+            } else {
+                $res[$name] = $info->value;
+            }
         }
         return $res;
+    }
+
+    public static function getNestedData()
+    {
     }
 
     public function getData()
@@ -192,6 +211,7 @@ class Record extends Model
                 }
             }
         }
+        // dd($res);
         return $res;
     }
 

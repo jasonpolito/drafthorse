@@ -47,16 +47,13 @@ trait BlockBuilderTrait
     public static function getBlockFields($parent): array
     {
         $fields = [];
-        // dd($parent);
         $blocks = Block::orderBy('id', 'desc')->get();
         foreach ($blocks as $block) {
             $blockFields = $block->fields;
-            // dd($blockFields);
             if (is_array($blockFields)) {
                 foreach ($blockFields as $blockField) {
-                    $type = $blockField['type'];
-                    // dd($blockField);
-                    // dd($type);
+                    $type = (string) $blockField['type'];
+                    $isRepeater = Str::contains($type, 'repeater', true);
                     if (!$type) continue;
                     $name = Str::snake($blockField['name']);
                     $component = $type::make("data.$name.value");
@@ -64,28 +61,31 @@ trait BlockBuilderTrait
                     $component->label($blockField['name'])
                         ->columnSpan('full')
                         ->reactive();
-                    if (Str::contains($type, 'repeater', true)) {
-                        $schema = [];
-                        $repeater = Repeater::make("data.$name.value")
-                            ->label($blockField['name'])
-                            ->cloneable()
-                            ->hidden(fn (Closure $get) => $get($parent) != $block->id)
-                            ->columnSpan('full')
-                            ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => ($state['type'] ?? $state['title'] ?? null))
-                            ->orderable()
-                            ->schema([$component]);
+                    self::configureAdditionalFieldSetup($blockField, $component);
+                    if ($isRepeater) {
+
+                        $repeaterSchema = [];
                         foreach ($blockField['fields'] as $repeaterField) {
-                            $type = $repeaterField['type'];
+                            $repeaterType = (string) $repeaterField['type'];
+                            if (!$repeaterType) continue;
                             $name = Str::snake($repeaterField['name']);
-                            $repeaterComponent = $type::make("$name");
+                            $repeaterComponent = $repeaterType::make("data.$name.value");
                             $repeaterComponent->label($repeaterField['name'])
+                                ->columnSpan('full')
                                 ->reactive();
-                            array_push($schema, $repeaterComponent);
+
+                            // add field specific attributes
+                            self::configureAdditionalFieldSetup($repeaterField, $repeaterComponent);
+
+                            $repeaterSchema[] = $repeaterComponent;
                         }
-                        $repeater->schema($schema);
+                        $component
+                            ->collapsible()
+                            ->cloneable()
+
+                            ->schema($repeaterSchema);
                     }
-                    array_push($fields, $repeater ?? $component);
+                    array_push($fields, $component);
                 }
             }
         }
