@@ -72,7 +72,6 @@ class Record extends Model
                     }
                     return $item;
                 });
-                // dd($records);
                 $data[$name] = collect($records);
                 $this->data = (object) $data;
             }
@@ -104,11 +103,13 @@ class Record extends Model
         foreach ($data as $name => $info) {
             if (is_array($info)) {
                 if ($info['type'] == 'relation') {
-                    $data[$name]['value'] = Record::whereIn('id', $info['value'])->get();
+                    $records = Record::whereIn('id', $info['value'])->get()->toArray();
+                    $data[$name] = $records;
                 }
             }
         }
         $this->data = $data;
+        return $this;
     }
 
     public static function findBySlug($slug)
@@ -121,18 +122,6 @@ class Record extends Model
         }
         return false;
     }
-
-    // public function getData()
-    // {
-    //     $data = $this->data;
-    //     foreach ($this->taxonomy->fields as $field) {
-    //         $name = Str::snake($field['name']);
-    //         if (!isset($this->data[$name])) {
-    //             $data[$name] = null;
-    //         }
-    //     }
-    //     return (object) $data;
-    // }
 
     public static function makeVariablesOptional($str)
     {
@@ -168,12 +157,10 @@ class Record extends Model
                 if (!empty($info->value)) {
                     $res[$name] = [];
                     foreach ($info->value as $nestedValue) {
-                        // dd($nestedValue->data);
                         $nestedMap = [];
                         foreach ($nestedValue->data as $nestedName => $nestedData) {
                             $nestedMap[$nestedName] = $nestedData->value;
                         }
-                        // dd($nestedMap);
                         $res[$name][] = $nestedMap;
                     }
                 }
@@ -188,30 +175,33 @@ class Record extends Model
     {
     }
 
-    public function getData()
+    public static function getData($record)
     {
         $res = [];
-        $res['name'] = $this->name;
-        $res['markup'] = $this->data['markup'];
-        $res['children'] = $this->children()->get()->map(function ($item) {
-            $data = $item->getData();
+        $res['name'] = $record->name;
+        $res['slug'] = $record->slug;
+        $res['markup'] = $record->data['markup'];
+        $res['children'] = $record->children()->get()->map(function ($item) {
+            $data = self::getData($item);
             $item->full_slug = $item->fullSlug();
             $item->data = $data;
             return $item;
         });
-        foreach ($this->data as $name => $info) {
+        foreach ($record->data as $name => $info) {
             if (isset($info['value'])) {
                 if (is_array($info['value'])) {
-                    $res[$name] = [
-                        'value' => $info['value'],
-                        'type' => $info['type']
-                    ];
+                    if ($info['type'] == 'relation') {
+                        $res[$name] = Record::whereIn('id', $info['value'])->get()->map(function ($item) {
+                            return self::getData($item);
+                        });
+                    } else {
+                        $res[$name] = $info['value'];
+                    }
                 } else {
                     $res[$name] = $info['value'];
                 }
             }
         }
-        // dd($res);
         return $res;
     }
 

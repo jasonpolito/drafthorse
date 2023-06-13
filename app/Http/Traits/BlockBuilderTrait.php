@@ -116,7 +116,10 @@ trait BlockBuilderTrait
                 ->extraAttributes(['class' => 'w-60 float-right'])
                 ->inlineLabel();
         }
-        if (Str::contains($type, 'FileUpload')) {
+        if (
+            Str::contains($type, 'FileUpload') ||
+            Str::contains($type, 'TextInput')
+        ) {
             $component->inlineLabel();
         }
         if (Str::contains($type, 'Select')) {

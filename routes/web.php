@@ -19,11 +19,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::view('/calc', 'calc');
+Route::view('/t9', 't9');
 
 Route::get('/{slug?}', function ($slug) {
     $record = Record::findBySlug($slug);
-    $record->withRelations();
-    $data = $record->getData();
+    // $record = $record->withRelations();
+    $data = Record::getData($record);
     // dd($data);
     return view('page', ['record' => $record, 'data' => $data]);
 })->name('records.show')->where(['slug' => '.*']);
