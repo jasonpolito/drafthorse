@@ -22,21 +22,6 @@ use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 
 trait BlockBuilderTrait
 {
-    const FIELD_TYPES = [
-        'Filament\Forms\Components\TextInput' => 'text',
-        'Filament\Forms\Components\Textarea' => 'text',
-        'Filament\Forms\Components\Builder' => 'text',
-        'AskerAkbar\GptTrixEditor\Components\GptTrixEditor' => 'text',
-        'blocks' => 'blocks',
-        'FilamentTiptapEditor\TiptapEditor' => 'rich_content',
-        'Filament\Forms\Components\Toggle' => 'boolean',
-        'Filament\Forms\Components\Select' => 'relation',
-        'Filament\Forms\Components\FileUpload' => 'files',
-        'Filament\Forms\Components\SpatieMediaLibraryFileUpload' => 'files',
-        'Awcodes\Curator\Components\Forms\CuratorPicker' => 'files',
-        'Filament\Forms\Components\ColorPicker' => 'text',
-        'Creagia\FilamentCodeField\CodeField' => 'raw',
-    ];
 
     public static function getTaxonomyFields($page = null)
     {
@@ -96,7 +81,7 @@ trait BlockBuilderTrait
     {
         $result = [];
         $name = Str::snake($field['name']);
-        $typeName = self::FIELD_TYPES[$field['type']];
+        $typeName = config('fieldtypes')[$field['type']];
         $hidden = Hidden::make("data.$name.type")
             ->afterStateHydrated(function (Hidden $component, $state) use ($typeName) {
                 $component->state($typeName);
