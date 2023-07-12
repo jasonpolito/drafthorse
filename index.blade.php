@@ -5,12 +5,12 @@
     </div>
 </div>
 
-<div class="prose">
-    <ul>
-        @foreach ($data->services as $service)
-            <li>
-                {{ $service->name }}
-            </li>
-        @endforeach
-    </ul>
-</div>
+<ul class="flex gap-6">
+    @foreach ($data->cols as $col)
+        <li class="w-1/4">
+            <div class="py-20 mb-6 bg-center bg-cover"
+                 style="background-image: url({{ Storage::url($col->image ?? '') }})"></div>
+            {{ $col->title }}
+        </li>
+    @endforeach
+</ul>

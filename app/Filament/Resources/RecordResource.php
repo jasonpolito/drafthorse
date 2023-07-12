@@ -142,7 +142,7 @@ class RecordResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->description(function ($record) {
-                        return !request()->input('tableFilters') ? $record->taxonomy->name : false;
+                        return !request()->input('tableFilters') ? ($record->taxonomy ? $record->taxonomy->name : 'N/A') : false;
                     })
                     ->limit(50)
                     ->toggleable()

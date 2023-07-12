@@ -15,6 +15,7 @@ class Layout extends Model
 
     protected $fillable = [
         'name',
+        'fields',
         'markup',
     ];
 
