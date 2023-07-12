@@ -50,7 +50,6 @@ class RecordResource extends Resource
                         Tab::make('Data')
                             ->schema(
                                 array_merge([], [self::getTaxonomyFields()])
-
                             ),
                         Tab::make('Markup')
                             ->schema([

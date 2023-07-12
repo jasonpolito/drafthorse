@@ -109,6 +109,7 @@ trait BlockBuilderTrait
         }
         if (Str::contains($type, 'Select')) {
             $component
+                ->inlineLabel()
                 ->searchable()
                 ->multiple();
             $component->options(function () use ($field) {

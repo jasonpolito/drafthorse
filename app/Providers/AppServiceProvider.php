@@ -29,20 +29,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $recordsGroupName = 'Content';
+
         $link = NavigationItem::make('All')
             ->url("/admin/records")
             ->isActiveWhen(fn (): bool => URL::full() == env('APP_URL') . '/admin/records')
             ->icon('heroicon-o-collection')
             ->activeIcon('heroicon-s-collection')
-            ->group('Records');
-        $ts = Schema::hasTable('taxonomies') ? Taxonomy::all() : [];
+            ->group($recordsGroupName);
+        $ts = Schema::hasTable('taxonomies') ? Taxonomy::orderBy('name')->get() : [];
         $menu = [];
         $link = NavigationItem::make('All')
             ->url("/admin/records")
             ->isActiveWhen(fn (): bool => URL::full() == env('APP_URL') . '/admin/records')
             ->icon('heroicon-o-collection')
             ->activeIcon('heroicon-s-collection')
-            ->group('Records');
+            ->group($recordsGroupName);
         array_push($menu, $link);
         foreach ($ts as $item) {
             $url = "/admin/records?tableFilters[taxonomy][values][0]=$item->id";
@@ -58,15 +60,15 @@ class AppServiceProvider extends ServiceProvider
                 })
                 ->icon($item->icon ?? 'heroicon-o-presentation-chart-line')
                 ->activeIcon($item->icon ? Str::replace('-o-', '-s-', $item->icon) : 'heroicon-s-presentation-chart-line')
-                ->group('Records');
+                ->group($recordsGroupName);
             array_push($menu, $link);
         }
 
 
-        Filament::serving(function () use ($menu) {
+        Filament::serving(function () use ($menu, $recordsGroupName) {
             Filament::registerNavigationGroups([
                 NavigationGroup::make()
-                    ->label('Records')
+                    ->label($recordsGroupName)
                     ->icon('heroicon-o-collection'),
                 NavigationGroup::make()
                     ->label('Views')

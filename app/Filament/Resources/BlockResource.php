@@ -71,6 +71,7 @@ class BlockResource extends Resource
                                                         'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
                                                         'Filament\Forms\Components\FileUpload' => 'File Upload',
                                                         'Filament\Forms\Components\Toggle' => 'Checkbox',
+                                                        'blocks' => 'Blocks',
                                                         'Filament\Forms\Components\Repeater' => 'Repeater',
                                                         'Filament\Forms\Components\Select' => 'Relationship',
                                                         'Filament\Forms\Components\ColorPicker' => 'Color Picker',
