@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TaxonomyResource\Pages;
 use App\Filament\Resources\TaxonomyResource\RelationManagers;
+use App\Http\Traits\SystemActionsTrait;
 use App\Models\Block;
 use App\Models\Taxonomy;
 use App\Models\User;
@@ -38,6 +39,8 @@ use Illuminate\Support\Str;
 
 class TaxonomyResource extends Resource
 {
+    use SystemActionsTrait;
+
     protected static ?string $model = Taxonomy::class;
     // protected static ?string $navigationLabel = 'Collections';
     protected static ?string $navigationGroup = 'Advanced';
@@ -128,23 +131,7 @@ class TaxonomyResource extends Resource
 
             ])
             ->bulkActions([
-                BulkAction::make('export')
-                    ->color('secondary')
-                    ->label(__('Export selected as JSON'))
-                    ->icon('heroicon-s-download')
-                    ->action(function (Collection $records) {
-                        $archive = new \ZipArchive;
-                        $archive->open('file.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-                        foreach ($records as $record) {
-                            $name = Str::slug($record->name, '_') . '.json';
-                            $return = $record->attributesToArray();
-                            $content = json_encode($return, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
-                            $archive->addFromString($name, $content);
-                        }
-                        $archive->close();
-                        return response()->download('file.zip');
-                    })
-                    ->deselectRecordsAfterCompletion(),
+                self::exportRecordsAsJson('Taxonomy'),
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),

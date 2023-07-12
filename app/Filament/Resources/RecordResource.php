@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecordResource\Pages;
 use App\Http\Traits\BlockBuilderTrait;
+use App\Http\Traits\SystemActionsTrait;
 use App\Models\Layout;
 use App\Models\Record;
 use Closure;
@@ -29,7 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 
 class RecordResource extends Resource
 {
-    use BlockBuilderTrait;
+    use BlockBuilderTrait, SystemActionsTrait;
 
     protected static ?string $label = 'record';
     protected static ?string $model = Record::class;
@@ -173,11 +174,14 @@ class RecordResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ForceDeleteBulkAction::make(),
-                Tables\Actions\RestoreBulkAction::make(),
-            ]);
+            ->bulkActions(array_merge(
+                self::bulkActions('Record'),
+                [
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                ]
+            ));
     }
 
     public static function getRelations(): array

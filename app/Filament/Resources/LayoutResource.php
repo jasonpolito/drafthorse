@@ -19,9 +19,14 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Http\Traits\BlockBuilderTrait;
+use App\Http\Traits\SystemActionsTrait;
 
 class LayoutResource extends Resource
 {
+
+    use SystemActionsTrait;
+
     protected static ?string $model = Layout::class;
     protected static ?string $navigationGroup = 'Views';
     protected static ?string $navigationIcon = 'heroicon-o-template';
@@ -73,6 +78,7 @@ class LayoutResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+                self::exportRecordsAsJson('Layout'),
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),
