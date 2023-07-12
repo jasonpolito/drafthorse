@@ -20,7 +20,7 @@ use Filament\Forms\Components\ViewField;
 use Illuminate\Support\Facades\Request;
 use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 
-trait BlockBuilderTrait
+trait HasBlockBuilder
 {
 
     public static function getTaxonomyFields($page = null)

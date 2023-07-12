@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BlockResource\Pages;
 use App\Filament\Resources\BlockResource\RelationManagers;
-use App\Http\Traits\BlockBuilderTrait;
+use App\Http\Traits\HasBlockBuilder;
 use App\Models\Page;
 use App\Models\Taxonomy;
 use App\Models\Block;
@@ -29,7 +29,7 @@ use Filament\Forms\Components\View;
 
 class BlockResource extends Resource
 {
-    use BlockBuilderTrait;
+    use HasBlockBuilder;
 
     protected static ?string $model = Block::class;
     protected static ?string $navigationGroup = 'Views';

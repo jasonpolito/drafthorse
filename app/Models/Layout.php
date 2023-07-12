@@ -15,8 +15,13 @@ class Layout extends Model
 
     protected $fillable = [
         'name',
-        'fields',
+        'uuid',
+        'data',
         'markup',
+    ];
+
+    protected $casts = [
+        'data' => 'array',
     ];
 
     /**
@@ -58,9 +63,13 @@ class Layout extends Model
      */
     public static function getBladeMarkup(Layout $layout, object $record): string
     {
-        $source = $layout->markup;
-        $parts = self::getLayoutParts($source);
         $data = Record::getData($record);
+        // $source = $layout->markup;
+        $blocks = $layout->data['layout']['value'];
+        $test = view('components.blocks', compact('data'))->render();
+        dd($test);
+        $source = Record::renderMarkup($layout->data->layout, ['data' => $data]);
+        $parts = self::getLayoutParts($source);
         $start = Record::renderMarkup($parts->start, ['data' => $data]);
         $markup = Arr::join([
             $start,

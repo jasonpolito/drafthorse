@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TaxonomyResource\Pages;
 use App\Filament\Resources\TaxonomyResource\RelationManagers;
-use App\Http\Traits\SystemActionsTrait;
+use App\Http\Traits\HasSystemActions;
 use App\Models\Block;
 use App\Models\Taxonomy;
 use App\Models\User;
@@ -39,7 +39,7 @@ use Illuminate\Support\Str;
 
 class TaxonomyResource extends Resource
 {
-    use SystemActionsTrait;
+    use HasSystemActions;
 
     protected static ?string $model = Taxonomy::class;
     // protected static ?string $navigationLabel = 'Collections';
@@ -108,8 +108,10 @@ class TaxonomyResource extends Resource
                                 TextInput::make('name')
                                     ->unique(ignorable: fn ($record) => $record)
                                     ->required(),
+                                Toggle::make('is_content')
+                                    ->reactive(),
                                 IconPicker::make('icon')
-                                    ->required()
+                                    ->hidden(fn (Closure $get) => !$get('is_content'))
                                     ->columns(5),
                             ]),
                     ])
@@ -130,12 +132,11 @@ class TaxonomyResource extends Resource
                 Tables\Actions\EditAction::make(),
 
             ])
-            ->bulkActions([
-                self::exportRecordsAsJson('Taxonomy'),
+            ->bulkActions(array_merge(self::bulkActions('Taxonomy'), [
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),
-            ]);
+            ]));
     }
 
     public static function getRelations(): array

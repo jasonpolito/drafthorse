@@ -18,14 +18,18 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Http\Traits\BlockBuilderTrait;
-use App\Http\Traits\SystemActionsTrait;
+use App\Http\Traits\HasBlockBuilder;
+use App\Http\Traits\HasSystemActions;
+use App\Models\Block;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 
 class LayoutResource extends Resource
 {
 
-    use SystemActionsTrait;
+    use HasBlockBuilder, HasSystemActions;
 
     protected static ?string $model = Layout::class;
     protected static ?string $navigationGroup = 'Views';
@@ -40,13 +44,25 @@ class LayoutResource extends Resource
                 Tabs::make('record')
                     ->columnSpan(2)
                     ->schema([
-                        Tab::make('Markup')
-                            ->columnSpanFull()
+                        Tab::make('Data')
                             ->schema([
-                                CodeField::make('markup')
-                                    ->withLineNumbers()
-                                    ->htmlField()
-                            ])
+                                Repeater::make("data.layout.value")
+                                    ->collapsible()
+                                    ->columnSpan('full')
+                                    ->orderable()
+                                    ->schema(array_merge(
+                                        [
+                                            Select::make('block')
+                                                ->reactive()
+                                                ->columnSpan('full')
+                                                ->options(function () {
+                                                    return Block::all()->pluck('name', 'id');
+                                                }),
+
+                                        ],
+                                        self::getBlockFields("block")
+                                    ))
+                            ]),
                     ]),
                 Card::make()
                     ->columnSpan(1)
@@ -107,5 +123,13 @@ class LayoutResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['uuid'] = Str::orderedUuid();
+
+        return $data;
     }
 }

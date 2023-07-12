@@ -3,8 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RecordResource\Pages;
-use App\Http\Traits\BlockBuilderTrait;
-use App\Http\Traits\SystemActionsTrait;
+use App\Http\Traits\HasBlockBuilder;
+use App\Http\Traits\HasSystemActions;
 use App\Models\Layout;
 use App\Models\Record;
 use Closure;
@@ -30,7 +30,7 @@ use Filament\Tables\Filters\SelectFilter;
 
 class RecordResource extends Resource
 {
-    use BlockBuilderTrait, SystemActionsTrait;
+    use HasBlockBuilder, HasSystemActions;
 
     protected static ?string $label = 'record';
     protected static ?string $model = Record::class;
