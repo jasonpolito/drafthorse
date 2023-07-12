@@ -125,9 +125,17 @@ class Record extends Model
 
     public static function makeVariablesOptional($str)
     {
-        $res = Str::replace('}}', " ?? '' }}", $str);
-        $res = Str::replace('!!}', " ?? '' !!}", $res);
-        return $res;
+        $pattern = '/\{{2}\s*\$([a-z\d_(\->)]+)\s*\}{2}/i';
+        preg_match_all($pattern, $str, $matches);
+        if (count($matches[1])) {
+            for ($i = 0; $i < count($matches[1]); $i++) {
+                $token = $matches[0][$i];
+                $varName = Str::replace('->', '→', '$' . $matches[1][$i]);
+                $replacement = Str::replace('}}', " ?? '($varName is not defined!)' }}", $token);
+                $str = Str::replace($token, $replacement, $str);
+            }
+        }
+        return $str;
     }
 
     public static function passDataToMarkup($str)

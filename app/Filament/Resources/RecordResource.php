@@ -65,10 +65,12 @@ class RecordResource extends Resource
                             ])
 
                     ]),
-                Card::make()
+                Tabs::make('General')
                     ->columnSpan(1)
-                    ->schema([
-                        Grid::make(1)
+                    ->tabs([
+                        Tab::make('Overview')
+                            ->label(false)
+                            ->icon('heroicon-o-bell')
                             ->schema([
                                 TextInput::make('name')
                                     ->columnSpanFull()
@@ -104,6 +106,10 @@ class RecordResource extends Resource
                                 Hidden::make('is_slug_changed_manually')
                                     ->default(false)
                                     ->dehydrated(false),
+                            ]),
+                        Tab::make('Details')
+                            ->label(false)
+                            ->schema([
                                 Select::make('taxonomy_id')
                                     ->reactive()
                                     ->required()

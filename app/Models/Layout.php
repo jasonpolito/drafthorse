@@ -59,8 +59,10 @@ class Layout extends Model
     {
         $source = $layout->markup;
         $parts = self::getLayoutParts($source);
+        $data = Record::getData($record);
+        $start = Record::renderMarkup($parts->start, ['data' => $data]);
         $markup = Arr::join([
-            $parts->start,
+            $start,
             Record::renderMarkup($record->data['markup'], ['data' => Record::getData($record)]),
             $parts->end,
         ], '');

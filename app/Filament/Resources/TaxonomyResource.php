@@ -39,6 +39,7 @@ use Illuminate\Support\Str;
 class TaxonomyResource extends Resource
 {
     protected static ?string $model = Taxonomy::class;
+    // protected static ?string $navigationLabel = 'Collections';
     protected static ?string $navigationGroup = 'Advanced';
     protected static ?string $recordTitleAttribute = 'name';
     protected static ?int $navigationSort = 3;
