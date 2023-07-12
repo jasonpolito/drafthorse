@@ -135,13 +135,13 @@ class Record extends Model
                 $str = Str::replace($token, $replacement, $str);
             }
         }
-        $pattern = '/\!{2}\s*\$([a-z\d_(\->)]+)\s*\!{2}/i';
+        $pattern = '/\{\!\!\s*\$([a-z\d_(\->)]+)\s*\!\!\}/i';
         preg_match_all($pattern, $str, $matches);
         if (count($matches[1])) {
             for ($i = 0; $i < count($matches[1]); $i++) {
                 $token = $matches[0][$i];
                 $varName = Str::replace('->', '→', '$' . $matches[1][$i]);
-                $replacement = Str::replace('}}', " ?? '($varName is not defined!)' }}", $token);
+                $replacement = Str::replace('!!}', " ?? '($varName is not defined!)' !!}", $token);
                 $str = Str::replace($token, $replacement, $str);
             }
         }
@@ -197,14 +197,16 @@ class Record extends Model
     {
         $res = [];
         $res['name'] = $record->name;
-        $res['slug'] = $record->slug;
-        $res['markup'] = $record->data['markup'];
-        $res['children'] = $record->children()->get()->map(function ($item) {
-            $data = self::getData($item);
-            $item->full_slug = $item->fullSlug();
-            $item->data = $data;
-            return $item;
-        });
+        if (false) {
+            $res['slug'] = $record->slug;
+            $res['markup'] = $record->data['markup'];
+            $res['children'] = $record->children()->get()->map(function ($item) {
+                $data = self::getData($item);
+                $item->full_slug = $item->fullSlug();
+                $item->data = $data;
+                return $item;
+            });
+        }
         foreach ($record->data as $name => $info) {
             if (isset($info['value'])) {
                 if (is_array($info['value'])) {

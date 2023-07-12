@@ -1,115 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $data->meta_title ?? 'Page Title' }}</title>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        clifford: '#da373d',
-                    }
-                }
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        .prose .btn {
-            @apply inline-block px-5 py-3 my-6 text-white no-underline transition bg-blue-500 rounded shadow;
-        }
-
-        .prose .btn:last-child {
-            @apply mb-0;
-        }
-
-        .prose .checked-list li::marker {
-            content: "✓";
-        }
-
-        .prose p {
-            min-height: 1px;
-        }
-
-        .prose .btn:hover {
-            @apply text-white shadow-lg;
-        }
-
-        @media screen(md) {
-            .prose .btn {
-                @apply py-4 my-6 px-7;
-            }
-        }
-
-        .prose .responsive {
-            @apply my-8 overflow-hidden rounded;
-        }
-
-        .prose .responsive:first-child {
-            @apply mt-0;
-        }
-
-        .prose .responsive:last-child {
-            @apply mb-0;
-        }
-
-        .prose>ol li>*:not(:where([class~="not-prose"] *)),
-        .prose>ul li>*:not(:where([class~="not-prose"] *)) {
-            margin: 0;
-        }
-
-        .prose [cols="3"] {
-            @apply grid grid-cols-3 gap-8;
-        }
-
-        .prose table *:last-child {
-            @apply mb-0;
-        }
-
-        .prose table *:first-child {
-            @apply mt-0;
-        }
-
-        .prose :where(tbody th, tfoot th):not(:where([class~="not-prose"] *)):not(:first-child) {
-            padding: 0.5714286em;
-        }
-
-        @media (min-width: 1024px) {
-            .lg\:prose-xl :where(tbody td, tfoot td):not(:where([class~="not-prose"] *)):not(:first-child) {
-                padding: 0.8888889em 0.6666667em;
-            }
-        }
-
-        .bg-fill {
-            @apply bg-center bg-cover;
-        }
-
-        .fill-parent {
-            @apply absolute top-0 left-0 w-full h-full;
-        }
-    </style>
-    <style>
-        * {
-            position: relative;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="bg-primary-500"></div>
-    @content
-    @if (auth()->user())
-        <div class="fixed bottom-0 right-0 z-50 p-4"><a
-               href="{{ route('filament.resources.records.edit', ['record' => $record]) }}"
-               class="block p-3 text-white rounded-full bg-slate-900">
-                <x-heroicon-o-pencil class="w-5 h-5" />
-            </a>
+<nav class="border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+    <div class="flex flex-wrap items-center justify-between max-w-screen-xl p-4 mx-auto">
+        <a href="#" class="flex items-center">
+            <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 mr-3" alt="Flowbite Logo" />
+            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
+        </a>
+        <button data-collapse-toggle="navbar-solid-bg" type="button"
+                class="inline-flex items-center justify-center w-10 h-10 p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 md:hidden"
+                aria-controls="navbar-solid-bg" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 17 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M1 1h15M1 7h15M1 13h15" />
+            </svg>
+        </button>
+        <div class="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
+            <ul
+                class="flex flex-col mt-4 font-medium rounded-lg bg-gray-50 dark:border-gray-700 dark:bg-gray-800 md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-transparent md:dark:bg-transparent">
+                @foreach ($data->links as $link)
+                    <li>
+                        <a href="{{ $link->url }}"
+                           class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:bg-transparent md:dark:hover:text-blue-500">{{ $link->text }}</a>
+                    </li>
+                @endforeach
+            </ul>
         </div>
-    @endif
-</body>
-
-</html>
+    </div>
+</nav>

@@ -61,14 +61,10 @@ class Layout extends Model
      * @param object $record
      * @return string
      */
-    public static function getBladeMarkup(Layout $layout, object $record): string
+    public static function getBladeMarkup(string $layoutMarkup, object $record): string
     {
         $data = Record::getData($record);
-        // $source = $layout->markup;
-        $blocks = $layout->data['layout']['value'];
-        $test = view('components.blocks', compact('data'))->render();
-        dd($test);
-        $source = Record::renderMarkup($layout->data->layout, ['data' => $data]);
+        $source = Record::renderMarkup($layoutMarkup, ['data' => $data]);
         $parts = self::getLayoutParts($source);
         $start = Record::renderMarkup($parts->start, ['data' => $data]);
         $markup = Arr::join([
@@ -76,6 +72,20 @@ class Layout extends Model
             Record::renderMarkup($record->data['markup'], ['data' => Record::getData($record)]),
             $parts->end,
         ], '');
+        return $markup;
+    }
+
+    public static function renderBlocks($layout, $data): string
+    {
+        $blocks = $layout->data['layout']['value'];
+        $markup = '';
+        foreach ($blocks as $blockData) {
+            $data = Record::getValueData(json_decode(json_encode($blockData['data'])));
+            $block = Block::find($blockData['block']);
+            if ($block) {
+                $markup .= Record::renderMarkup($block->markup, ['data' => $data], true);
+            }
+        }
         return $markup;
     }
 
@@ -89,7 +99,8 @@ class Layout extends Model
     public static function render(object $record): string
     {
         $layout = Layout::find($record->data['layout']);
-        $markup = self::getBladeMarkup($layout, $record);
+        $layoutMarkup = self::renderBlocks($layout, $record);
+        $markup = self::getBladeMarkup($layoutMarkup, $record);
         $data = json_decode(json_encode(Record::getData($record)));
         return  Blade::render($markup, [
             'record' => $record,
