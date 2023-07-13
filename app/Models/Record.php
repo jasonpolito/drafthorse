@@ -53,6 +53,13 @@ class Record extends Model
         return $this->hasMany(Record::class, 'parent_id');
     }
 
+    public function scopeType($query, $type)
+    {
+        return $query->whereHas('taxonomy', function ($q) use ($type) {
+            return $q->where('name', $type);
+        });
+    }
+
     public function buildTaxonomy()
     {
         foreach ($this->taxonomy->fields as $field) {

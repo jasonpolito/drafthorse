@@ -112,6 +112,7 @@ trait HasBlockBuilder
             $component
                 ->inlineLabel()
                 ->searchable()
+                ->preload()
                 ->multiple();
             $component->options(function () use ($field) {
                 $ids = $field['relations'];
@@ -145,6 +146,8 @@ trait HasBlockBuilder
                             [
                                 Select::make('block')
                                     ->reactive()
+                                    ->preload()
+                                    ->searchable()
                                     ->columnSpan('full')
                                     ->options(function () {
                                         $blocks = Block::all()->map(function ($item) {
