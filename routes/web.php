@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Block;
 use App\Models\Page;
+use App\Models\Partial;
 use App\Models\Record;
 use Illuminate\Support\Facades\Route;
 

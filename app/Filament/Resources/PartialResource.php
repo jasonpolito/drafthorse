@@ -2,10 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\LayoutResource\Pages;
-use App\Models\Layout;
+use App\Filament\Resources\PartialResource\Pages;
+use App\Http\Traits\HasBlockBuilder;
+use App\Http\Traits\HasSystemActions;
+use App\Models\Block;
+use App\Models\Partial;
+use App\Models\Record;
+use Creagia\FilamentCodeField\CodeField;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Illuminate\Support\Str;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
@@ -15,23 +22,16 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Http\Traits\HasBlockBuilder;
-use App\Http\Traits\HasSystemActions;
-use App\Models\Block;
-use App\Models\Partial;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 
-class LayoutResource extends Resource
+class PartialResource extends Resource
 {
-
     use HasBlockBuilder, HasSystemActions;
 
-    protected static ?string $model = Layout::class;
+    protected static ?string $model = Partial::class;
     protected static ?string $navigationGroup = 'Views';
-    protected static ?string $navigationIcon = 'heroicon-o-template';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
@@ -51,6 +51,8 @@ class LayoutResource extends Resource
                                     ->schema(array_merge(
                                         [
                                             Select::make('block')
+                                                ->searchable()
+                                                ->preload()
                                                 ->reactive()
                                                 ->columnSpan('full')
                                                 ->options(function () {
@@ -69,6 +71,13 @@ class LayoutResource extends Resource
                                         ],
                                         self::getBlockFields("block")
                                     ))
+                            ]),
+                        Tab::make('Markup')
+                            ->columnSpanFull()
+                            ->schema([
+                                CodeField::make('markup')
+                                    ->withLineNumbers()
+                                    ->htmlField()
                             ]),
                     ]),
                 Card::make()
@@ -93,6 +102,16 @@ class LayoutResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->limit(50)
+                    ->toggleable()
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('updated_at')
+                    ->label('Updated')
+                    ->toggleable()
+                    ->sortable()
+                    ->since(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -100,12 +119,14 @@ class LayoutResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                self::exportRecordsAsJson('Layout'),
-                Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ForceDeleteBulkAction::make(),
-                Tables\Actions\RestoreBulkAction::make(),
-            ]);
+            ->bulkActions(array_merge(
+                self::bulkActions('Record'),
+                [
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                ]
+            ));
     }
 
     public static function getRelations(): array
@@ -118,9 +139,9 @@ class LayoutResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLayouts::route('/'),
-            'create' => Pages\CreateLayout::route('/create'),
-            'edit' => Pages\EditLayout::route('/{record}/edit'),
+            'index' => Pages\ListPartials::route('/'),
+            'create' => Pages\CreatePartial::route('/create'),
+            'edit' => Pages\EditPartial::route('/{record}/edit'),
         ];
     }
 
@@ -130,13 +151,5 @@ class LayoutResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
-
-
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['uuid'] = Str::orderedUuid();
-
-        return $data;
     }
 }

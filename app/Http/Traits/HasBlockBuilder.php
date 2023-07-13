@@ -5,6 +5,7 @@ namespace App\Http\Traits;
 use App\Models\Record;
 use App\Models\Taxonomy;
 use App\Models\Block;
+use App\Models\Partial;
 use Closure;
 use Filament\Forms\Components\Builder as BlockBuilder;
 use Filament\Forms\Components\TextInput;
@@ -42,7 +43,7 @@ trait HasBlockBuilder
                     if (!$type) continue;
                     $name = Str::snake($blockField['name']);
                     $component = $type::make("data.$name.value");
-                    $component->hidden(fn (Closure $get) => $get($parent) != $block->id);
+                    $component->hidden(fn (Closure $get) => $get($parent) != $block->uuid);
                     $component->label($blockField['name'])
                         ->columnSpan('full')
                         ->reactive();
@@ -146,7 +147,16 @@ trait HasBlockBuilder
                                     ->reactive()
                                     ->columnSpan('full')
                                     ->options(function () {
-                                        return Block::all()->pluck('name', 'id');
+                                        $blocks = Block::all()->map(function ($item) {
+                                            $item->name .= ' (block)';
+                                            return $item;
+                                        })->pluck('name', 'uuid');
+                                        $partials = Partial::all()->map(function ($item) {
+                                            $item->name .= ' (partial)';
+                                            return $item;
+                                        })->pluck('name', 'uuid');
+                                        $items = $blocks->merge($partials);
+                                        return $items;
                                     }),
 
                             ],

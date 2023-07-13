@@ -81,7 +81,13 @@ class Layout extends Model
         $markup = '';
         foreach ($blocks as $blockData) {
             $data = Record::getValueData(json_decode(json_encode($blockData['data'])));
-            $block = Block::find($blockData['block']);
+            $block = Block::firstWhere('uuid', $blockData['block']);
+            if (!$block) {
+                $block = Partial::firstWhere('uuid', $blockData['block']);
+                $data = Record::getValueData(json_decode(json_encode($block['data'])))['layout'][0];
+                $markup .= Record::renderMarkup($block->markup, ['data' => $data], true);
+                dd($markup);
+            }
             if ($block) {
                 $markup .= Record::renderMarkup($block->markup, ['data' => $data], true);
             }
