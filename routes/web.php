@@ -25,6 +25,9 @@ Route::view('/t9', 't9');
 
 Route::get('/{slug?}', function ($slug) {
     $record = Record::findBySlug($slug);
+    if (!$record) {
+        abort(404);
+    }
     // $record = $record->withRelations();
     $data = Record::getData($record);
     // dd($data);

@@ -44,8 +44,9 @@ class PartialResource extends Resource
                     ->schema([
                         Tab::make('Data')
                             ->schema([
-                                Repeater::make("data.layout.value")
+                                Repeater::make("data.content.value")
                                     ->collapsible()
+                                    ->label(false)
                                     ->columnSpan('full')
                                     ->orderable()
                                     ->schema(array_merge(
@@ -72,13 +73,13 @@ class PartialResource extends Resource
                                         self::getBlockFields("block")
                                     ))
                             ]),
-                        Tab::make('Markup')
-                            ->columnSpanFull()
-                            ->schema([
-                                CodeField::make('markup')
-                                    ->withLineNumbers()
-                                    ->htmlField()
-                            ]),
+                        // Tab::make('Markup')
+                        //     ->columnSpanFull()
+                        //     ->schema([
+                        //         CodeField::make('markup')
+                        //             ->withLineNumbers()
+                        //             ->htmlField()
+                        //     ]),
                     ]),
                 Card::make()
                     ->columnSpan(1)

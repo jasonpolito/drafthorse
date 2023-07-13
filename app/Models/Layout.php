@@ -63,30 +63,31 @@ class Layout extends Model
      */
     public static function getBladeMarkup(string $layoutMarkup, object $record): string
     {
-        $data = Record::getData($record);
-        $source = Record::renderMarkup($layoutMarkup, ['data' => $data]);
+        $recordData = Record::getData($record);
+        $source = Record::renderMarkup($layoutMarkup, ['data' => $recordData]);
         $parts = self::getLayoutParts($source);
-        $start = Record::renderMarkup($parts->start, ['data' => $data]);
+        $start = Record::renderMarkup($parts->start, ['data' => $recordData]);
+        $end = Record::renderMarkup($parts->end, ['data' => $recordData]);
+        $pageMarkup = Record::renderMarkup($record->data['markup'], ['data' => $recordData]);
+        // dd($pageMarkup);
         $markup = Arr::join([
             $start,
-            Record::renderMarkup($record->data['markup'], ['data' => Record::getData($record)]),
-            $parts->end,
+            $pageMarkup,
+            $end,
         ], '');
         return $markup;
     }
 
-    public static function renderBlocks($layout, $data): string
+    public static function renderBlocks($blocks, $data): string
     {
-        $blocks = $layout->data['layout']['value'];
+        // dd($blocks);
         $markup = '';
         foreach ($blocks as $blockData) {
             $data = Record::getValueData(json_decode(json_encode($blockData['data'])));
             $block = Block::firstWhere('uuid', $blockData['block']);
             if (!$block) {
-                $block = Partial::firstWhere('uuid', $blockData['block']);
-                $data = Record::getValueData(json_decode(json_encode($block['data'])))['layout'][0];
-                $markup .= Record::renderMarkup($block->markup, ['data' => $data], true);
-                dd($markup);
+                $partial = Partial::firstWhere('uuid', $blockData['block']);
+                $markup .= self::renderBlocks($partial['data']['content']['value'], ['data' => $data], true);
             }
             if ($block) {
                 $markup .= Record::renderMarkup($block->markup, ['data' => $data], true);
@@ -105,10 +106,10 @@ class Layout extends Model
     public static function render(object $record): string
     {
         $layout = Layout::find($record->data['layout']);
-        $layoutMarkup = self::renderBlocks($layout, $record);
-        $markup = self::getBladeMarkup($layoutMarkup, $record);
+        $layoutMarkup = self::renderBlocks($layout->data['layout']['value'], $record);
+        $pageMarkup = self::getBladeMarkup($layoutMarkup, $record);
         $data = json_decode(json_encode(Record::getData($record)));
-        return  Blade::render($markup, [
+        return  Blade::render($pageMarkup, [
             'record' => $record,
             'data' => $data,
         ]);
