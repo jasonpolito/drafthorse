@@ -24,6 +24,21 @@ use AskerAkbar\GptTrixEditor\Components\GptTrixEditor;
 trait HasBlockBuilder
 {
 
+    public static function blockOptions()
+    {
+        return [
+            'Filament\Forms\Components\TextInput' => 'Short Text',
+            'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
+            'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
+            // 'blocks' => 'Block Editor',
+            'Filament\Forms\Components\FileUpload' => 'File Upload',
+            'Filament\Forms\Components\Toggle' => 'Checkbox',
+            'Filament\Forms\Components\Repeater' => 'Repeater',
+            'Filament\Forms\Components\Select' => 'Relationship',
+            'Filament\Forms\Components\ColorPicker' => 'Color Picker',
+        ];
+    }
+
     public static function getTaxonomyFields($page = null)
     {
         return Grid::make(1)

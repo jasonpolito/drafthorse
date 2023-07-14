@@ -67,17 +67,7 @@ class BlockResource extends Resource
                                                     ->reactive()
                                                     ->searchable()
                                                     ->preload()
-                                                    ->options([
-                                                        'Filament\Forms\Components\TextInput' => 'Short Text',
-                                                        'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
-                                                        'Filament\Forms\Components\FileUpload' => 'File Upload',
-                                                        'Filament\Forms\Components\Toggle' => 'Checkbox',
-                                                        'blocks' => 'Blocks',
-                                                        'Filament\Forms\Components\Repeater' => 'Repeater',
-                                                        'Filament\Forms\Components\Select' => 'Relationship',
-                                                        'Filament\Forms\Components\ColorPicker' => 'Color Picker',
-                                                        'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
-                                                    ]),
+                                                    ->options(array_merge(self::blockOptions(), ['blocks' => 'Block Editor'])),
 
                                                 Select::make('relations')
                                                     ->hidden(fn (Closure $get, $state) => $get('type') !== 'Filament\Forms\Components\Select')
@@ -113,16 +103,7 @@ class BlockResource extends Resource
                                                                                     ->reactive()
                                                                                     ->searchable()
                                                                                     ->preload()
-                                                                                    ->options([
-                                                                                        'Filament\Forms\Components\TextInput' => 'Short Text',
-                                                                                        'FilamentTiptapEditor\TiptapEditor' => 'Rich Content',
-                                                                                        'Filament\Forms\Components\FileUpload' => 'File Upload',
-                                                                                        'Filament\Forms\Components\Toggle' => 'Checkbox',
-                                                                                        'Filament\Forms\Components\Repeater' => 'Repeater',
-                                                                                        'Filament\Forms\Components\Select' => 'Relationship',
-                                                                                        'Filament\Forms\Components\ColorPicker' => 'Color Picker',
-                                                                                        'Creagia\FilamentCodeField\CodeField' => 'Code Editor',
-                                                                                    ]),
+                                                                                    ->options(self::blockOptions()),
                                                                             ])
                                                                     ]),
                                                             ])
