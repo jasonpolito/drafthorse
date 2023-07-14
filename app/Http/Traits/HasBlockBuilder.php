@@ -156,7 +156,17 @@ trait HasBlockBuilder
                     $component = Repeater::make("data.$name.value")
                         ->collapsible()
                         ->columnSpan('full')
-                        ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['data']['title']['value'] ?? null)
+                        ->itemLabel(function (array $state): ?string {
+                            $uuid = $state['block_uuid'];
+                            $block = Block::firstWhere('uuid', $uuid);
+                            if (!$block) {
+                                $partial = Partial::firstWhere('uuid', $uuid);
+                                return $partial->name ? $partial->name . ' (partial)' : '';
+                            } else {
+                                return $block->name . ' (block)';
+                            }
+                        })
+                        // ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['data']['title']['value'] ?? null)
                         ->orderable()
                         ->schema(array_merge(
                             [

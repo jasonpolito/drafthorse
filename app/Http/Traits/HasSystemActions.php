@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Filament\Pages\Actions\Action;
 use Filament\Pages\Actions\ActionGroup;
 use Illuminate\Support\Facades\Log;
+use ZipArchive;
 
 trait HasSystemActions
 {
@@ -60,21 +61,50 @@ trait HasSystemActions
                 ->label("Import $plural")
                 ->icon('heroicon-o-upload')
                 ->action(function (array $data) use ($recordClass): void {
-                    $archive = new \ZipArchive;
+
+                    // paths for saving
                     $public =  storage_path() . '/app/public/';
                     $path = $public . $data['import_archive'];
+
+                    /**
+                     * instantiate a new ZipArchive
+                     */
+                    $archive = new \ZipArchive;
                     if ($archive->open($path) === TRUE) {
+
+                        /**
+                         * extract and store to temporary storage path
+                         */
                         $tmp =  storage_path() . '/app/public/.tmp/' . uniqid();
                         $archive->extractTo($tmp);
                         $archive->close();
+
+                        /**
+                         * remove "directories" from files
+                         */
                         $records = array_diff(scandir($tmp), ['..', '.']);
+
+                        /**
+                         * if there are records in the zip and the file
+                         * is not a direcory, iterate through each record 
+                         */
                         if (count($records)) {
                             foreach ($records as $recordFile) {
                                 $filePath = "$tmp/$recordFile";
                                 if (!is_dir($filePath)) {
+
+                                    /**
+                                     * parse the imported data and check to see
+                                     * if a record already exists. if the uuid 
+                                     * already exists, generate a new one
+                                     */
                                     $importData = json_decode(file_get_contents($filePath));
                                     $exists = $recordClass::withTrashed()->where('uuid', $importData->uuid)->exists();
                                     $uuid = $exists ? (string) Str::orderedUuid() : $importData->uuid;
+
+                                    /**
+                                     * basic import data that most records share
+                                     */
                                     $newRecord = [
                                         'name' => $importData->name,
                                         'type' => $importData->type,
@@ -82,13 +112,21 @@ trait HasSystemActions
                                         'data' => $importData->data ?? [],
                                         'fields' => $importData->fields ?? []
                                     ];
-                                    Log::info($newRecord);
+
+                                    /**
+                                     * extra fields if the imported data is 
+                                     * the "Record" type (icon, taxonomy, slug)
+                                     */
                                     if ($importData->type == 'Record') {
                                         $newSlug = $exists ? "$importData->slug-$uuid" : $importData->slug;
                                         $newRecord['taxonomy_id'] = $importData->taxonomy_id;
                                         $newRecord['slug'] = $newSlug;
                                         $newRecord['icon'] = $importData->icon ?? null;
                                     }
+
+                                    /**
+                                     * create the record and delete the file
+                                     */
                                     $recordClass::create($newRecord);
                                     unlink($filePath);
                                 } else {
@@ -96,8 +134,16 @@ trait HasSystemActions
                                 }
                             }
                         }
+
+                        /**
+                         * remove the file
+                         */
                         rmdir($tmp);
                     }
+
+                    /**
+                     * remove the uploaded zip
+                     */
                     unlink($path);
                 })
                 ->form([
