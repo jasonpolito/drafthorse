@@ -14,14 +14,15 @@ class Block extends Model
 
     protected $fillable = [
         'name',
-        'fields',
+        'uuid',
+        'data',
         'markup',
     ];
     protected $guarded = ['id'];
 
     protected $casts = [
         'blocks' => 'array',
-        'fields' => 'array',
+        'data' => 'array',
     ];
 
     public const FIELD_TYPES = [

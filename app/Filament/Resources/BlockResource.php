@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BlockResource\Pages;
 use App\Filament\Resources\BlockResource\RelationManagers;
 use App\Http\Traits\HasBlockBuilder;
+use App\Http\Traits\HasSystemActions;
 use App\Models\Page;
 use App\Models\Taxonomy;
 use App\Models\Block;
@@ -29,7 +30,7 @@ use Filament\Forms\Components\View;
 
 class BlockResource extends Resource
 {
-    use HasBlockBuilder;
+    use HasBlockBuilder, HasSystemActions;
 
     protected static ?string $model = Block::class;
     protected static ?string $navigationGroup = 'Views';
@@ -47,7 +48,7 @@ class BlockResource extends Resource
                         Tab::make('Data')
                             ->columnSpanFull()
                             ->schema([
-                                Repeater::make('fields')
+                                Repeater::make('data')
                                     ->columnSpan(2)
                                     // ->collapsed()
                                     ->collapsible()
@@ -96,7 +97,6 @@ class BlockResource extends Resource
                                                             ->schema([
                                                                 Repeater::make('fields')
                                                                     ->columnSpan(2)
-                                                                    // ->collapsed()
                                                                     ->collapsible()
                                                                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? $state['title'] ?? null)
                                                                     ->orderable()
@@ -161,11 +161,6 @@ class BlockResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
-                // Tables\Columns\TextColumn::make('blocks'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
@@ -173,11 +168,11 @@ class BlockResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
+            ->bulkActions(array_merge(self::bulkActions('Block'), [
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
                 Tables\Actions\RestoreBulkAction::make(),
-            ]);
+            ]));
     }
 
     public static function getRelations(): array

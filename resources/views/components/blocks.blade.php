@@ -7,9 +7,9 @@
         @foreach ($data->$name as $item)
             @php
                 $data = App\Models\Record::getValueData($item->data);
-                $block = App\Models\Block::firstWhere('uuid', $item->block);
+                $block = App\Models\Block::firstWhere('uuid', $item->block_uuid);
                 if (!$block) {
-                    $block = App\Models\Partial::firstWhere('uuid', $item->block);
+                    $block = App\Models\Partial::firstWhere('uuid', $item->block_uuid);
                 }
             @endphp
             @if ($block)

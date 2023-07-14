@@ -46,11 +46,13 @@ class Layout extends Model
     public static function getLayoutParts(string $markup): object
     {
         $parts = explode('@content', $markup);
-        $start = self::attachDataToBlocks($parts[0]);
-        $end = self::attachDataToBlocks($parts[1]);
+        if (count($parts) > 1) {
+            $start = self::attachDataToBlocks($parts[0]);
+            $end = self::attachDataToBlocks($parts[1]);
+        }
         return (object) [
-            'start' => $start,
-            'end' => $end,
+            'start' => $start ?? '',
+            'end' => $end ?? '',
         ];
     }
 
@@ -68,8 +70,12 @@ class Layout extends Model
         $parts = self::getLayoutParts($source);
         $start = Record::renderMarkup($parts->start, ['data' => $recordData]);
         $end = Record::renderMarkup($parts->end, ['data' => $recordData]);
-        $pageMarkup = Record::renderMarkup($record->data['markup'], ['data' => $recordData]);
-        // dd($pageMarkup);
+        $content = $record->data['content'];
+        // dd($content);
+        $pageSource = self::renderBlocks($content['value'], $record);
+        // dd($pageSource);
+
+        $pageMarkup = Record::renderMarkup($pageSource, ['data' => $recordData]);
         $markup = Arr::join([
             $start,
             $pageMarkup,
@@ -80,14 +86,15 @@ class Layout extends Model
 
     public static function renderBlocks($blocks, $data): string
     {
-        // dd($blocks);
         $markup = '';
         foreach ($blocks as $blockData) {
             $data = Record::getValueData(json_decode(json_encode($blockData['data'])));
-            $block = Block::firstWhere('uuid', $blockData['block']);
+            $block = Block::firstWhere('uuid', $blockData['block_uuid']);
             if (!$block) {
-                $partial = Partial::firstWhere('uuid', $blockData['block']);
-                $markup .= self::renderBlocks($partial['data']['content']['value'], ['data' => $data], true);
+                $partial = Partial::firstWhere('uuid', $blockData['block_uuid']);
+                if ($partial) {
+                    $markup .= self::renderBlocks($partial['data']['content']['value'], ['data' => $data], true);
+                }
             }
             if ($block) {
                 $markup .= Record::renderMarkup($block->markup, ['data' => $data], true);

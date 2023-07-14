@@ -44,31 +44,7 @@ class LayoutResource extends Resource
                     ->schema([
                         Tab::make('Data')
                             ->schema([
-                                Repeater::make("data.layout.value")
-                                    ->collapsible()
-                                    ->columnSpan('full')
-                                    ->orderable()
-                                    ->schema(array_merge(
-                                        [
-                                            Select::make('block')
-                                                ->reactive()
-                                                ->columnSpan('full')
-                                                ->options(function () {
-                                                    $blocks = Block::all()->map(function ($item) {
-                                                        $item->name .= ' (block)';
-                                                        return $item;
-                                                    })->pluck('name', 'uuid');
-                                                    $partials = Partial::all()->map(function ($item) {
-                                                        $item->name .= ' (partial)';
-                                                        return $item;
-                                                    })->pluck('name', 'uuid');
-                                                    $items = $blocks->merge($partials);
-                                                    return $items;
-                                                }),
-
-                                        ],
-                                        self::getBlockFields("block")
-                                    ))
+                                self::blockBuilderField("data.layout.value")
                             ]),
                     ]),
                 Card::make()

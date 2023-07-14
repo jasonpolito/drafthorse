@@ -21,6 +21,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::view('/calc', 'calc');
+Route::view('/template', 'template');
 Route::view('/t9', 't9');
 
 Route::get('/{slug?}', function ($slug) {
@@ -28,8 +29,6 @@ Route::get('/{slug?}', function ($slug) {
     if (!$record) {
         abort(404);
     }
-    // $record = $record->withRelations();
     $data = Record::getData($record);
-    // dd($data);
     return view('page', ['record' => $record, 'data' => $data]);
 })->name('records.show')->where(['slug' => '.*']);

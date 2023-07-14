@@ -42,7 +42,6 @@ class TaxonomyResource extends Resource
     use HasSystemActions;
 
     protected static ?string $model = Taxonomy::class;
-    // protected static ?string $navigationLabel = 'Collections';
     protected static ?string $navigationGroup = 'Advanced';
     protected static ?string $recordTitleAttribute = 'name';
     protected static ?int $navigationSort = 3;
@@ -108,10 +107,7 @@ class TaxonomyResource extends Resource
                                 TextInput::make('name')
                                     ->unique(ignorable: fn ($record) => $record)
                                     ->required(),
-                                Toggle::make('is_content')
-                                    ->reactive(),
                                 IconPicker::make('icon')
-                                    ->hidden(fn (Closure $get) => !$get('is_content'))
                                     ->columns(5),
                             ]),
                     ])

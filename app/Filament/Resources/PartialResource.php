@@ -44,42 +44,8 @@ class PartialResource extends Resource
                     ->schema([
                         Tab::make('Data')
                             ->schema([
-                                Repeater::make("data.content.value")
-                                    ->collapsible()
-                                    ->label(false)
-                                    ->columnSpan('full')
-                                    ->orderable()
-                                    ->schema(array_merge(
-                                        [
-                                            Select::make('block')
-                                                ->searchable()
-                                                ->preload()
-                                                ->reactive()
-                                                ->columnSpan('full')
-                                                ->options(function () {
-                                                    $blocks = Block::all()->map(function ($item) {
-                                                        $item->name .= ' (block)';
-                                                        return $item;
-                                                    })->pluck('name', 'uuid');
-                                                    $partials = Partial::all()->map(function ($item) {
-                                                        $item->name .= ' (partial)';
-                                                        return $item;
-                                                    })->pluck('name', 'uuid');
-                                                    $items = $blocks->merge($partials);
-                                                    return $items;
-                                                }),
-
-                                        ],
-                                        self::getBlockFields("block")
-                                    ))
+                                self::blockBuilderField("data.content.value")
                             ]),
-                        // Tab::make('Markup')
-                        //     ->columnSpanFull()
-                        //     ->schema([
-                        //         CodeField::make('markup')
-                        //             ->withLineNumbers()
-                        //             ->htmlField()
-                        //     ]),
                     ]),
                 Card::make()
                     ->columnSpan(1)

@@ -64,46 +64,45 @@ trait HasSystemActions
                     $public =  storage_path() . '/app/public/';
                     $path = $public . $data['import_archive'];
                     if ($archive->open($path) === TRUE) {
-                        $tmp =  storage_path() . '/app/public/temp/' . uniqid();
+                        $tmp =  storage_path() . '/app/public/.tmp/' . uniqid();
                         $archive->extractTo($tmp);
                         $archive->close();
                         $records = array_diff(scandir($tmp), ['..', '.']);
                         if (count($records)) {
                             foreach ($records as $recordFile) {
                                 $filePath = "$tmp/$recordFile";
-                                $importData = json_decode(file_get_contents($filePath));
-                                $count = $recordClass::withTrashed()->where('name', $importData->name)->count();
-                                $name = $importData->name;
-                                $newName = $count ? "$name ($count)" : $name;
-                                $newSlug = $count ? "$importData->slug-$count" : $importData->slug;
-                                $recordClass::create([
-                                    'name' => $newName,
-                                    'type' => $importData->type,
-                                    'taxonomy_id' => $importData->taxonomy_id,
-                                    'slug' => $newSlug,
-                                    'uuid' => Str::orderedUuid(),
-                                    'icon' => $importData->icon ?? null,
-                                    'data' => $importData->data ?? []
-                                ]);
-                                unlink($filePath);
+                                if (!is_dir($filePath)) {
+                                    $importData = json_decode(file_get_contents($filePath));
+                                    $exists = $recordClass::withTrashed()->where('uuid', $importData->uuid)->exists();
+                                    $uuid = $exists ? (string) Str::orderedUuid() : $importData->uuid;
+                                    $newRecord = [
+                                        'name' => $importData->name,
+                                        'type' => $importData->type,
+                                        'uuid' => $uuid,
+                                        'data' => $importData->data ?? [],
+                                        'fields' => $importData->fields ?? []
+                                    ];
+                                    Log::info($newRecord);
+                                    if ($importData->type == 'Record') {
+                                        $newSlug = $exists ? "$importData->slug-$uuid" : $importData->slug;
+                                        $newRecord['taxonomy_id'] = $importData->taxonomy_id;
+                                        $newRecord['slug'] = $newSlug;
+                                        $newRecord['icon'] = $importData->icon ?? null;
+                                    }
+                                    $recordClass::create($newRecord);
+                                    unlink($filePath);
+                                } else {
+                                    rmdir($filePath);
+                                }
                             }
                         }
                         rmdir($tmp);
-                    } else {
-                        Log::info($archive->open($path) === TRUE);
                     }
-                    // $importData = json_decode(file_get_contents(storage_path() . '/app/public/' . $data['json']));
-                    // $exists = $recordClass::withTrashed()->where('name', $importData->name);
-                    // $name = $importData->name;
-                    // $newName = $exists ? $name . ' (' . $recordClass::all()->count() . ')' : $name;
-                    // $recordClass::create([
-                    //     'name' => $newName,
-                    //     'icon' => $importData->icon,
-                    //     'fields' => $importData->fields
-                    // ]);
+                    unlink($path);
                 })
                 ->form([
                     FileUpload::make('import_archive')
+                        ->acceptedFileTypes(['application/zip'])
                         ->label("records_export.zip")
                         ->required()
                 ])

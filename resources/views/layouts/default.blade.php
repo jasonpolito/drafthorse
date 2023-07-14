@@ -1,25 +1,16 @@
-<nav class="py-4 text-white bg-slate-800">
-    <x-container>
-        <div class="flex items-center justify-between">
-            <div>
-                // Logo
-            </div>
-            <div>
-                <ul class="flex">
-                    @foreach ($data->links as $link)
-                        <li>
-                            <a href="{{ $link->url }}"
-                               class="block px-4 py-2 rounded-md hover:bg-slate-900">{{ $link->text }}</a>
-                        </li>
-                    @endforeach
-                    <li>
-                        <a href="#" class="block px-4 py-2 rounded-md hover:bg-slate-900">
-                            <x-heroicon-o-menu />
-                        </a>
+<!DOCTYPE html>
+<html lang="en">
 
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </x-container>
-</nav>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+</head>
+
+<body>
+
+</body>
+
+</html>

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->string('name');
+            $table->uuid('uuid');
             $table->string('icon')->nullable();
             $table->json('fields')->nullable();
         });

@@ -16,8 +16,9 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->softDeletes();
-            $table->string('name')->unique();
-            $table->string('slug')->unique();
+            $table->string('name');
+            $table->uuid('uuid');
+            $table->string('slug');
             $table->longText('markup')->nullable();
             $table->json('seo')->nullable();
             $table->json('data')->nullable();

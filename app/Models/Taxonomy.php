@@ -14,6 +14,7 @@ class Taxonomy extends Model
     protected $fillable = [
         'name',
         'icon',
+        'uuid',
         'fields',
     ];
 

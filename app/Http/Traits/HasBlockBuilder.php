@@ -35,7 +35,7 @@ trait HasBlockBuilder
         $fields = [];
         $blocks = Block::orderBy('id', 'desc')->get();
         foreach ($blocks as $block) {
-            $blockFields = $block->fields;
+            $blockFields = $block->data;
             if (is_array($blockFields)) {
                 foreach ($blockFields as $blockField) {
                     $type = (string) $blockField['type'];
@@ -51,6 +51,7 @@ trait HasBlockBuilder
                     if ($isRepeater) {
 
                         $repeaterSchema = [];
+                        // dd($blockField);
                         foreach ($blockField['fields'] as $repeaterField) {
                             $repeaterType = (string) $repeaterField['type'];
                             if (!$repeaterType) continue;
@@ -144,7 +145,8 @@ trait HasBlockBuilder
                         ->orderable()
                         ->schema(array_merge(
                             [
-                                Select::make('block')
+                                Select::make('block_uuid')
+                                    ->label('Block')
                                     ->reactive()
                                     ->preload()
                                     ->searchable()
@@ -163,7 +165,7 @@ trait HasBlockBuilder
                                     }),
 
                             ],
-                            self::getBlockFields("block")
+                            self::getBlockFields("block_uuid")
                         ));
                 } else {
                     $component = $type::make("data.$name.value")
@@ -182,5 +184,48 @@ trait HasBlockBuilder
             }
         }
         return $fields;
+    }
+
+    public static function blockBuilderField($field)
+    {
+        // return Repeater::make("data.layout.value")
+        return Repeater::make($field)
+            ->collapsible()
+            ->columnSpan('full')
+            ->orderable()
+            ->itemLabel(function (array $state): ?string {
+                $uuid = $state['block_uuid'];
+                $block = Block::firstWhere('uuid', $uuid);
+                if (!$block) {
+                    $partial = Partial::firstWhere('uuid', $uuid);
+                    return $partial->name ? $partial->name . ' (partial)' : '';
+                } else {
+                    return $block->name . ' (block)';
+                }
+            })
+            ->schema(array_merge(
+                [
+                    Select::make('block_uuid')
+                        ->label('Block')
+                        ->reactive()
+                        ->preload()
+                        ->searchable()
+                        ->columnSpan('full')
+                        ->options(function () {
+                            $blocks = Block::all()->map(function ($item) {
+                                $item->name = '(block) ' . $item->name;
+                                return $item;
+                            })->pluck('name', 'uuid');
+                            $partials = Partial::all()->map(function ($item) {
+                                $item->name = '(partial) ' . $item->name;
+                                return $item;
+                            })->pluck('name', 'uuid');
+                            $items = $blocks->merge($partials);
+                            return $items;
+                        }),
+
+                ],
+                self::getBlockFields("block_uuid")
+            ));
     }
 }
